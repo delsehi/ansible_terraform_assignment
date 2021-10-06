@@ -1,1 +1,2 @@
 keypair = "The name of your keypair"
+external_network_id = "Get this value by running openstack network list"
