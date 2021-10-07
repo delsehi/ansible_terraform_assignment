@@ -16,6 +16,10 @@ variable "security_groups" {
 }
 
 # Network
+data "openstack_networking_network_v2" "public_network" {
+  name = "public"
+}
+
 resource "openstack_networking_network_v2" "network_1" {
   name           = "network_1"
   admin_state_up = "true"
@@ -30,9 +34,7 @@ resource "openstack_networking_subnet_v2" "subnet_1" {
 
 resource "openstack_networking_router_v2" "public_router" {
     name = "public_router"
-    # This must be changed. "openstack network list" to get it. 
-    # TODO: Move to variable
-    external_network_id = "fd401e50-9484-4883-9672-a2814089528c" 
+    external_network_id = data.openstack_networking_network_v2.public_network.id
 }
 
 resource "openstack_networking_router_interface_v2" "router_interface" {
@@ -40,9 +42,9 @@ resource "openstack_networking_router_interface_v2" "router_interface" {
     subnet_id = openstack_networking_subnet_v2.subnet_1.id
 }
 
-resource "openstack_compute_secgroup_v2" "secgroup_1" {
-  name        = "secgroup_1"
-  description = "a security group"
+resource "openstack_compute_secgroup_v2" "ssh_secgroup" {
+  name        = "ssh_secgroup"
+  description = "sceurity group for ssh, opens port 22 for tcp"
 
   rule {
     from_port   = 22
@@ -52,29 +54,29 @@ resource "openstack_compute_secgroup_v2" "secgroup_1" {
   }
 }
 
-
-
-# Create an instance
-resource "openstack_compute_instance_v2" "server" {
-  name = "server"
-  image_name        = "Ubuntu Minimal 18.04"
-  flavor_name       = "c1-r2-d5"
-  availability_zone = "Education"
-  key_pair          = var.keypair
-  security_groups   = ["default", "${openstack_compute_secgroup_v2.secgroup_1.id}"]
-
-  network {
-   name = "network_1"
-  }
-}
-
 resource "openstack_networking_floatingip_v2" "fip_1" {
   pool = "public"
 }
 
+# Create an instance
+resource "openstack_compute_instance_v2" "control_node" {
+  name = "control_node"
+  image_name        = "Ubuntu Minimal 18.04"
+  flavor_name       = "c1-r2-d5"
+  availability_zone = "Education"
+  key_pair          = var.keypair
+  security_groups   = ["default", "${openstack_compute_secgroup_v2.ssh_secgroup.id}"]
+
+  network {
+   name = "network_1"
+  }
+
+  user_data = "${file("install-ansible.sh")}"
+}
+
 resource "openstack_compute_floatingip_associate_v2" "fip_1" {
   floating_ip = "${openstack_networking_floatingip_v2.fip_1.address}"
-  instance_id = "${openstack_compute_instance_v2.server.id}"
+  instance_id = "${openstack_compute_instance_v2.control_node.id}"
 }
 
 output "public_ip" {
