@@ -1,0 +1,9 @@
+---
+- name: Install MySQL and other things
+  hosts: wordpress
+  remote_user: ubuntu 
+  become: yes # Maybe needed?
+
+  roles: 
+  - mariadb
+

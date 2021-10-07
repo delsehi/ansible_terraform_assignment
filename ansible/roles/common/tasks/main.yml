@@ -1,0 +1,8 @@
+---
+# Upgrade all packages as a first step
+- name: upgrade packages
+  become_user: root
+  become: true
+  become_method: sudo
+  apt: 
+    upgrade: full
