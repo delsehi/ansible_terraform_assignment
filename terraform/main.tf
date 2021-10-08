@@ -71,8 +71,17 @@ resource "openstack_compute_instance_v2" "control_node" {
     name = "network_1"
   }
 
-  user_data = file("install-ansible.sh")
+  #user_data = file("install-ansible.sh")
+  user_data = data.template_file.control_node_user_data.rendered
 
+}
+
+data "template_file" "control_node_user_data" {
+  template = "${file("templates/control_node_user_data.tpl")}"
+
+  vars = {
+    master_db_ip = openstack_compute_instance_v2.db_master.network[0].fixed_ip_v4
+  }
 }
 
 resource "openstack_compute_floatingip_associate_v2" "fip_1" {
