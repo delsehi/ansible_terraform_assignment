@@ -6,7 +6,7 @@ terraform {
   }
 }
 variable "keypair" {
-  type    = string # Set this value in terraform.tfvars
+  type = string # Set this value in terraform.tfvars
 }
 
 
@@ -33,13 +33,13 @@ resource "openstack_networking_subnet_v2" "subnet_1" {
 }
 
 resource "openstack_networking_router_v2" "public_router" {
-    name = "public_router"
-    external_network_id = data.openstack_networking_network_v2.public_network.id
+  name                = "public_router"
+  external_network_id = data.openstack_networking_network_v2.public_network.id
 }
 
 resource "openstack_networking_router_interface_v2" "router_interface" {
-    router_id = openstack_networking_router_v2.public_router.id
-    subnet_id = openstack_networking_subnet_v2.subnet_1.id
+  router_id = openstack_networking_router_v2.public_router.id
+  subnet_id = openstack_networking_subnet_v2.subnet_1.id
 }
 
 resource "openstack_compute_secgroup_v2" "ssh_secgroup" {
@@ -60,7 +60,7 @@ resource "openstack_networking_floatingip_v2" "fip_1" {
 
 # Create an instance
 resource "openstack_compute_instance_v2" "control_node" {
-  name = "control_node"
+  name              = "control_node"
   image_name        = "Ubuntu Minimal 18.04"
   flavor_name       = "c1-r2-d5"
   availability_zone = "Education"
@@ -68,18 +68,38 @@ resource "openstack_compute_instance_v2" "control_node" {
   security_groups   = ["default", "${openstack_compute_secgroup_v2.ssh_secgroup.id}"]
 
   network {
-   name = "network_1"
+    name = "network_1"
   }
 
-  user_data = "${file("install-ansible.sh")}"
+  user_data = file("install-ansible.sh")
+
 }
 
 resource "openstack_compute_floatingip_associate_v2" "fip_1" {
-  floating_ip = "${openstack_networking_floatingip_v2.fip_1.address}"
-  instance_id = "${openstack_compute_instance_v2.control_node.id}"
+  floating_ip = openstack_networking_floatingip_v2.fip_1.address
+  instance_id = openstack_compute_instance_v2.control_node.id
 }
 
+# MariaDB Master node 
+resource "openstack_compute_instance_v2" "db_master" {
+  name              = "db_master"
+  image_name        = "Ubuntu Minimal 18.04"
+  flavor_name       = "c1-r2-d5"
+  availability_zone = "Education"
+  key_pair          = var.keypair
+  security_groups   = ["default", "${openstack_compute_secgroup_v2.ssh_secgroup.id}"]
+  network {
+    name = "network_1"
+  }
+}
+
+
 output "public_ip" {
-    value = openstack_networking_floatingip_v2.fip_1.address
-    description = "The public ip address of the server"
+  value       = openstack_networking_floatingip_v2.fip_1.address
+  description = "The public ip address of the server"
+}
+output "master_db_ip" {
+  value = openstack_compute_instance_v2.db_master.network[0].fixed_ip_v4
+  description = "Internal ip of mariadb master node"
+  
 }
