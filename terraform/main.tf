@@ -9,7 +9,6 @@ variable "keypair" {
   type = string # Set this value in terraform.tfvars
 }
 
-
 variable "security_groups" {
   type    = list(string)
   default = ["default"] # Name of default security group
@@ -58,10 +57,10 @@ resource "openstack_networking_floatingip_v2" "fip_1" {
   pool = "public"
 }
 
-# Create an instance
+# Create the control node for Ansible
 resource "openstack_compute_instance_v2" "control_node" {
   name              = "control_node"
-  image_name        = "Ubuntu Minimal 18.04"
+  image_name        = "Ubuntu server 20.04"
   flavor_name       = "c1-r2-d5"
   availability_zone = "Education"
   key_pair          = var.keypair
@@ -71,28 +70,40 @@ resource "openstack_compute_instance_v2" "control_node" {
     name = "network_1"
   }
 
-  #user_data = file("install-ansible.sh")
-  user_data = data.template_file.control_node_user_data.rendered
+  # User data is run at startup. This template contains the cloud-init
+  user_data = data.template_cloudinit_config.config.rendered
 
 }
 
-data "template_file" "control_node_user_data" {
-  template = "${file("templates/control_node_user_data.tpl")}"
-
-  vars = {
-    master_db_ip = openstack_compute_instance_v2.db_master.network[0].fixed_ip_v4
-  }
-}
-
+# Public IP for the control node
 resource "openstack_compute_floatingip_associate_v2" "fip_1" {
   floating_ip = openstack_networking_floatingip_v2.fip_1.address
   instance_id = openstack_compute_instance_v2.control_node.id
+}
+# CLOUD INIT
+# This makes a template from cn_config.tpl and adds the ip adresses
+# for Ansible's inventory in /etc/ansible/hosts
+data "template_file" "script" {
+  template = "${file("templates/cn_config.tpl")}"
+  vars = {
+    # The id of the MariaDB server created below
+    master_db_ip = openstack_compute_instance_v2.db_master.network[0].fixed_ip_v4
+  }
+}
+data "template_cloudinit_config" "config" {
+  gzip = false
+  base64_encode = false
+  part {
+    filename = "init.cfg"
+    content_type = "text/cloud-config"
+    content = "${data.template_file.script.rendered}"
+  }
 }
 
 # MariaDB Master node 
 resource "openstack_compute_instance_v2" "db_master" {
   name              = "db_master"
-  image_name        = "Ubuntu Minimal 18.04"
+  image_name        = "Ubuntu server 20.04"
   flavor_name       = "c1-r2-d5"
   availability_zone = "Education"
   key_pair          = var.keypair
@@ -109,6 +120,6 @@ output "public_ip" {
 }
 output "master_db_ip" {
   value = openstack_compute_instance_v2.db_master.network[0].fixed_ip_v4
-  description = "Internal ip of mariadb master node"
+  description = "Internal ip of MariaDB master node"
   
 }
