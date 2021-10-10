@@ -4,6 +4,7 @@ package_upgrade: true
 packages:
   - ansible
   - python
+  - unzip
 write_files:
   - content: |
       [mariadb]
@@ -18,3 +19,6 @@ ssh_keys:
   rsa_private: |
     ${private_key}
   rsa_public: ${public_key}
+runcmd:
+  - 'curl --header "Private-Token: ${access_token}" "${api_url}" --output /home/ubuntu/repo'
+  - 'unzip /home/ubuntu/repo -d /home/ubuntu'

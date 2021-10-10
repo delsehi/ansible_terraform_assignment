@@ -2,3 +2,5 @@ keypair      = "ev222ie_Keypair"
 wp_instances = 3
 private_key  = "/Users/elias/.ssh/2dv517.pem"
 public_key   = "/Users/elias/.ssh/2dv517_pub.pem"
+access_token = "6p-DwdQmQmtjzyV8zN76"
+git_api_url = "https://gitlab.lnu.se/api/v4/projects/16762/repository/archive.zip"

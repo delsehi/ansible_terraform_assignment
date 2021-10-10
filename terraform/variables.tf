@@ -20,3 +20,9 @@ variable "private_key" {
 variable "public_key" {
   type = string # Path to your public ssh key for cscloud, this will be added to the control_node
 }
+variable "git_access_token" {
+  type = string # Access token to ansible playbooks
+}
+variable "git_api_url" {
+  type = string # Url to gitlab api endpoint to download repo
+}

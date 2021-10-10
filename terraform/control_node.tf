@@ -1,11 +1,12 @@
 # Declare variables needed to install and configure Ansible on control node
 locals {
   install_ansible = {
-    wp_instances = var.wp_instances,
     private_key  = file(var.private_key),
     public_key   = file(var.public_key),
     master_db_ip = openstack_compute_instance_v2.db_master.network[0].fixed_ip_v4,
-    wp_nodes = openstack_compute_instance_v2.wordpress
+    wp_nodes = openstack_compute_instance_v2.wordpress,
+    access_token = var.git_access_token,
+    api_url = var.git_api_url
   }
 }
 
