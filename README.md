@@ -11,6 +11,9 @@ Install Terraform.
 
 Install the Openstack CLI. 
 
-In the dashboard, download the clouds.yaml and add to the directory. 
+In the CsCloud dashboard, download the clouds.yaml and openrc.sh and add them to the directory. 
+
+Run "source ./openrc.sh" and type in the password to your CsCloud account to add these as environment variables.
 
 Create a file terraform.tfvars and add the neccessary information. Look at terraform.tfvars.sample for an example. 
+
