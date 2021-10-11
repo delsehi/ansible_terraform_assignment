@@ -1,11 +1,18 @@
 ---
 ## installs and sets up Mariadb
-- name: Install MariaDB package
-  become: yes
-  apt: name={{item}} state=latest
-  with_items:
-    - mariadb-server
-    - python-mysqldb
+- name: Add repository key to the system
+  apt_key: 
+    url: https://mariadb.org/mariadb_release_signing_key.asc
+    state: present
+- name: Install MariaDB repository
+  apt_repository: repo='deb https://mirror.kumi.systems/mariadb/repo/10.6/ubuntu focal main' state=present
+
+- name: Install MariaDB Server
+  apt: name=mariadb-server state=latest update_cache=yes
+
+
+#- name: Install python module
+#  apt: name=python-mysqldb state=latest
 
 - name: Start MariaDB Service
   service: name=mysql state=started enabled=yes
