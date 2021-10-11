@@ -9,6 +9,11 @@ write_files:
   - content: |
       [mariadb]
       ${master_db_ip}
+      ${slave_db_ip}
+
+      [file server]
+      ${file_server_ip}
+      
       [wordpress]
 %{ for node in wp_nodes ~}
       ${node.network[0].fixed_ip_v4}
