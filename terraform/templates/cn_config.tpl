@@ -30,7 +30,10 @@ ssh_keys:
     ${private_key}
   rsa_public: ${public_key}
 runcmd:
-  - 'curl --header "Private-Token: ${access_token}" "${api_url}" --output /home/ubuntu/repo' # Download repo with ansible playbooks
+  # Download repo with ansible playbooks
+  - 'curl --header "Private-Token: ${access_token}" "${api_url}" --output /home/ubuntu/repo'
   - 'unzip /home/ubuntu/repo -d /home/ubuntu'
+  - 'rm -r /home/ubuntu/repo'
+  # Set up ssh key for ansible
   - 'cp /etc/ssh/ssh_host_rsa_key home/ubuntu/.ssh/key'
   - 'chmod 444 home/ubuntu/.ssh/key'

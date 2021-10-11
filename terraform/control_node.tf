@@ -8,7 +8,7 @@ locals {
     file_server_ip = openstack_compute_instance_v2.file_server.network[0].fixed_ip_v4
     wp_nodes       = openstack_compute_instance_v2.wordpress,
     access_token   = var.git_access_token,
-    api_url        = var.git_api_url
+    api_url        = var.git_api_url,
   }
 }
 
