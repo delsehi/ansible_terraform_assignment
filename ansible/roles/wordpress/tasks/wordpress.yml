@@ -1,0 +1,19 @@
+- name: Download wordpress
+  register: zip_file
+  get_url:
+    url: "http://wordpress.org/wordpress-{{ wp_version }}.tar.gz"
+    dest: "{{ wp_download_dir }}/wordpress-{{ wp_version }}.tar.gz"
+
+- name: Unarchive
+  ansible.builtin.unarchive:
+    src: "{{ zip_file.dest }}"
+    dest: "/var/www/{{ domain_name }}"
+    remote_src: yes
+
+- name: Set ownership
+  file:
+    path: "/var/www/{{ domain_name }}"
+    state: directory
+    recurse: yes
+    owner: www-data
+    group: www-data
