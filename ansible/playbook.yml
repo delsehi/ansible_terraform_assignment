@@ -4,8 +4,10 @@
   remote_user: ubuntu 
   become: yes # Maybe needed?
 
-  roles:
-    - mariadb
+  roles: 
+  - common
+  - dbmaster
+  - dbslave
 
 - name: Install Wordpress and dependencies
   hosts: wp

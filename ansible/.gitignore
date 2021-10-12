@@ -36,5 +36,6 @@ Temporary Items
 
 # Hosts for ansible
 hosts
+ansible.cfg
 
 # End of https://www.toptal.com/developers/gitignore/api/ansible,macos

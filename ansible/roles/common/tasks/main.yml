@@ -6,3 +6,4 @@
   become_method: sudo
   apt: 
     upgrade: full
+    update_cache: true

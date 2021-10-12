@@ -110,4 +110,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+secrets
+secrets/*
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,terraform,ansible,git
