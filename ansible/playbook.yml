@@ -3,7 +3,10 @@
   hosts: wordpress
   remote_user: ubuntu 
   become: yes # Maybe needed?
+  vars_files:
+    - ./vars/wordpress.yml
 
   roles: 
-  - mariadb
+    - wordpress
+    - mariadb
 
