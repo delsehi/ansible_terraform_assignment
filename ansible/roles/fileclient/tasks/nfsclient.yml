@@ -1,0 +1,12 @@
+---
+- name: install nfs client
+  apt:
+    name: nfs-common
+  
+- name: create shared directory
+  file:
+    path: /var/sharedfiles
+    state: directory
+
+- name: mount the nfs server
+  shell: "mount -t nfs {{ hostvars[inventory_hostname]['groups']['fs'][0] }}:/mnt/sharedfiles /var/sharedfiles"

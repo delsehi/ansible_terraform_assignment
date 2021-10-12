@@ -1,13 +1,23 @@
 ---
+- name: Install and set up nfs-server
+  hosts: fs
+  remote_user: ubuntu
+  become: yes
+
+  roles:
+    - common
+    - fileserver
+
 - name: Install MySQL and other things
   hosts: wordpress
-  remote_user: ubuntu 
+  remote_user: ubuntu
   become: yes # Maybe needed?
 
-  roles: 
+  roles:
   - common
   - dbmaster
   - dbslave
+  - fileclient
 
 - name: Install Wordpress and dependencies
   hosts: wp
@@ -19,3 +29,4 @@
   roles:
     - common
     - wordpress
+    - fileclient
