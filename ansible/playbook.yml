@@ -9,3 +9,13 @@
   - dbmaster
   - dbslave
 
+- name: Install Wordpress and dependencies
+  hosts: wp
+  remote_user: ubuntu
+  become: yes
+  vars_files:
+    - ./vars/wordpress.yml
+
+  roles:
+    - common
+    - wordpress

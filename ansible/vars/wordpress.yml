@@ -1,0 +1,5 @@
+---
+apache_config: acme.conf
+domain_name: acme.com
+wp_download_dir: /srv
+wp_version: 5.8.1
