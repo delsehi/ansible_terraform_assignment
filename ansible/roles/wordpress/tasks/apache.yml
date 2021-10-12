@@ -1,8 +1,8 @@
 ---
 - name: Set up Apache VirtualHost
   template:
-    src: "files/acme.conf"
-    dest: "/etc/apache2/sites-available/{{ config }}"
+    src: "files/{{ apache_config }}"
+    dest: "/etc/apache2/sites-available/{{ apache_config }}"
   notify: Reload Apache
 
 # - name: Enable rewrite module
@@ -10,7 +10,7 @@
 #   notify: Reload Apache
 
 - name: Enable new site
-  shell: /usr/sbin/a2ensite {{ config }}
+  shell: /usr/sbin/a2ensite {{ apache_config }}
   notify: Reload Apache
 
 - name: Disable default Apache site
