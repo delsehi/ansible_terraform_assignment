@@ -14,6 +14,9 @@ variable "keypair" {
 variable "wp_instances" {
   type = number # The number of wordpress server instances you want to create
 }
+variable "cidr" {
+  type = string
+}
 variable "private_key" {
   type = string # Path to your private ssh key for cscloud, this will be added to the control_node
 }
