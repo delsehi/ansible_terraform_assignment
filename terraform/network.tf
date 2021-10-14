@@ -29,60 +29,92 @@ resource "openstack_networking_router_interface_v2" "router_interface" {
   subnet_id = openstack_networking_subnet_v2.subnet_1.id
 }
 
-resource "openstack_networking_port_v2" "loadbalancer_port" {
-  name       = "port_loadbalancer"
-  network_id = openstack_networking_network_v2.network_1.id
+#################################################################
+# Ports are created and connects compute instances to the network.
+# The security groups to be used are also added to the ports.
+##################################################################
 
-  fixed_ip {
-    subnet_id = openstack_networking_subnet_v2.subnet_1.id
-  }
-}
-
+# Create port for the control node
 resource "openstack_networking_port_v2" "control_node_port" {
-  name       = "port_control_node"
+  name       = "control_node_port"
   network_id = openstack_networking_network_v2.network_1.id
 
   fixed_ip {
     subnet_id = openstack_networking_subnet_v2.subnet_1.id
   }
+
+  security_group_ids = [
+    openstack_networking_secgroup_v2.ssh_secgroup.id
+  ]
 }
 
+# Create port for the file server
 resource "openstack_networking_port_v2" "file_server_port" {
-  name       = "port_file_server"
+  name       = "file_server_port"
   network_id = openstack_networking_network_v2.network_1.id
 
   fixed_ip {
     subnet_id = openstack_networking_subnet_v2.subnet_1.id
   }
+
+  security_group_ids = [
+    openstack_networking_secgroup_v2.ssh_secgroup.id
+  ]
 }
 
+# Create ports for wordpress instances
 resource "openstack_networking_port_v2" "wp_ports" {
   count      = var.wp_instances
-  name       = "port_wp_${count.index + 1}"
+  name       = "wp_${count.index + 1}_port"
   network_id = openstack_networking_network_v2.network_1.id
 
   fixed_ip {
     subnet_id = openstack_networking_subnet_v2.subnet_1.id
   }
+  security_group_ids = [
+    openstack_networking_secgroup_v2.ssh_secgroup.id,
+    openstack_networking_secgroup_v2.http_secgroup.id
+  ]
 }
 
+# Create ports for the databases
 resource "openstack_networking_port_v2" "db_ports" {
   count      = 2
-  name       = "port_db_${count.index + 1}"
+  name       = "db_${count.index + 1}_port"
   network_id = openstack_networking_network_v2.network_1.id
 
   fixed_ip {
     subnet_id = openstack_networking_subnet_v2.subnet_1.id
   }
+
+  security_group_ids = [
+    openstack_networking_secgroup_v2.ssh_secgroup.id
+  ]
 }
 
-# Create a floating ip
-resource "openstack_networking_floatingip_v2" "fip_1" {
+##############################################################
+# Floating ips are defined and associated to compute instances
+# or network resources
+##############################################################
+
+# Create a floating ip for control node
+resource "openstack_networking_floatingip_v2" "control_node_fip" {
+  pool = "public"
+}
+
+# Create floating ip for loadbalancer
+resource "openstack_networking_floatingip_v2" "loadbalancer_fip" {
   pool = "public"
 }
 
 # Connect floating ip to control node
-resource "openstack_compute_floatingip_associate_v2" "fip_1" {
-  floating_ip = openstack_networking_floatingip_v2.fip_1.address
-  instance_id = openstack_compute_instance_v2.control_node.id
+resource "openstack_networking_floatingip_associate_v2" "fip_1" {
+  floating_ip = openstack_networking_floatingip_v2.control_node_fip.address
+  port_id     = openstack_networking_port_v2.control_node_port.id
+}
+
+# Connect floating ip to loadbalancer
+resource "openstack_networking_floatingip_associate_v2" "loadbalancer_fip_associate" {
+  floating_ip = openstack_networking_floatingip_v2.loadbalancer_fip.address
+  port_id     = openstack_lb_loadbalancer_v2.loadbalancer.vip_port_id
 }
