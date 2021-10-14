@@ -1,13 +1,12 @@
 ---
-- name: Install MySQL and other things
-  hosts: wordpress
+- name: Install MariaDB
+  hosts: dbmaster
   remote_user: ubuntu 
-  become: yes # Maybe needed?
+  become: yes
 
   roles: 
   - common
-  - dbmaster
-  - dbslave
+  - mariadb
 
 - name: Install Wordpress and dependencies
   hosts: wp
