@@ -29,7 +29,7 @@
       - mariadb-client
     state: present
     update_cache: yes
-  #  cache_valid_time: "{{ aptget_update_cache_valid_time }}"
+    cache_valid_time: "{{ aptget_update_cache_valid_time }}"
 
 - name: Start and enable MariaDB service
   service:

@@ -3,7 +3,6 @@
   hosts: dbmaster
   remote_user: ubuntu 
   become: yes
-
   roles: 
   - common
   - mariadb
@@ -14,7 +13,6 @@
   become: yes
   vars_files:
     - ./vars/wordpress.yml
-
   roles:
     - common
     - wordpress

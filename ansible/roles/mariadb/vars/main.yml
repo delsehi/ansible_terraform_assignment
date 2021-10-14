@@ -8,10 +8,9 @@ mariadb_root_password: changeme
 # mariadb_server_path_utiles: /root/utiles
 
 
-mariadb_databases: []
-# delete [] and define databases
-# - database1
-# - database2
+mariadb_databases:
+ - wordpress
+
 
 mariadb_users: []
 # delete [] and define databases
@@ -28,8 +27,10 @@ mariadb_users: []
 #    password: "clave3"
 #    priv: "bdpruebas.*:ALL"
 
+
+# Delfi: Maybe bind should be something else. '127.0.0.1'
 mariadb_options:
-  bind_address: '127.0.0.1'
+  bind_address: '0.0.0.0'
   performance_schema: on
   skip_name_resolve: 1
   max_connections: 100
