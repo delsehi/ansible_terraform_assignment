@@ -102,19 +102,18 @@ resource "openstack_networking_floatingip_v2" "control_node_fip" {
   pool = "public"
 }
 
-# Create floating ip for loadbalancer
+# Create floating ip and connect to loadbalancer
 resource "openstack_networking_floatingip_v2" "loadbalancer_fip" {
-  pool = "public"
+  pool    = "public"
+  port_id = openstack_lb_loadbalancer_v2.loadbalancer.vip_port_id
+
+  depends_on = [
+    openstack_lb_listener_v2.listener
+  ]
 }
 
 # Connect floating ip to control node
 resource "openstack_networking_floatingip_associate_v2" "fip_1" {
   floating_ip = openstack_networking_floatingip_v2.control_node_fip.address
   port_id     = openstack_networking_port_v2.control_node_port.id
-}
-
-# Connect floating ip to loadbalancer
-resource "openstack_networking_floatingip_associate_v2" "loadbalancer_fip_associate" {
-  floating_ip = openstack_networking_floatingip_v2.loadbalancer_fip.address
-  port_id     = openstack_lb_loadbalancer_v2.loadbalancer.vip_port_id
 }
