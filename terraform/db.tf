@@ -5,7 +5,6 @@ resource "openstack_compute_instance_v2" "db_master" {
   flavor_name       = "c1-r2-d5"
   availability_zone = "Education"
   key_pair          = var.keypair
-  security_groups   = [ "default", openstack_networking_secgroup_v2.ssh_secgroup.id ]
 
   network {
     port = openstack_networking_port_v2.db_ports[0].id
@@ -19,7 +18,6 @@ resource "openstack_compute_instance_v2" "db_slave" {
   flavor_name       = "c1-r2-d5"
   availability_zone = "Education"
   key_pair          = var.keypair
-  security_groups   = [ "default", openstack_networking_secgroup_v2.ssh_secgroup.id ]
 
   network {
     port = openstack_networking_port_v2.db_ports[1].id
