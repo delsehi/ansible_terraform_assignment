@@ -19,10 +19,10 @@ resource "openstack_compute_instance_v2" "control_node" {
   flavor_name       = "c1-r2-d5"
   availability_zone = "Education"
   key_pair          = var.keypair
-  security_groups   = ["default", "${openstack_compute_secgroup_v2.ssh_secgroup.id}"]
+  security_groups   = [ "default", openstack_networking_secgroup_v2.ssh_secgroup.id ]
 
   network {
-    name = "network_1"
+    port = openstack_networking_port_v2.control_node_port.id
   }
 
   user_data = templatefile("./templates/cn_config.tpl", local.install_ansible)

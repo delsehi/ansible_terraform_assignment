@@ -13,7 +13,7 @@ resource "openstack_networking_network_v2" "network_1" {
 resource "openstack_networking_subnet_v2" "subnet_1" {
   name       = "subnet_1"
   network_id = openstack_networking_network_v2.network_1.id
-  cidr       = "192.168.199.0/24"
+  cidr       = var.cidr
   ip_version = 4
 }
 
@@ -29,16 +29,50 @@ resource "openstack_networking_router_interface_v2" "router_interface" {
   subnet_id = openstack_networking_subnet_v2.subnet_1.id
 }
 
-# Create ssh security group
-resource "openstack_compute_secgroup_v2" "ssh_secgroup" {
-  name        = "ssh_secgroup"
-  description = "sceurity group for ssh, opens port 22 for tcp"
+resource "openstack_networking_port_v2" "loadbalancer_port" {
+  name       = "port_loadbalancer"
+  network_id = openstack_networking_network_v2.network_1.id
 
-  rule {
-    from_port   = 22
-    to_port     = 22
-    ip_protocol = "tcp"
-    cidr        = "0.0.0.0/0"
+  fixed_ip {
+    subnet_id = openstack_networking_subnet_v2.subnet_1.id
+  }
+}
+
+resource "openstack_networking_port_v2" "control_node_port" {
+  name       = "port_control_node"
+  network_id = openstack_networking_network_v2.network_1.id
+
+  fixed_ip {
+    subnet_id = openstack_networking_subnet_v2.subnet_1.id
+  }
+}
+
+resource "openstack_networking_port_v2" "file_server_port" {
+  name       = "port_file_server"
+  network_id = openstack_networking_network_v2.network_1.id
+
+  fixed_ip {
+    subnet_id = openstack_networking_subnet_v2.subnet_1.id
+  }
+}
+
+resource "openstack_networking_port_v2" "wp_ports" {
+  count      = var.wp_instances
+  name       = "port_wp_${count.index + 1}"
+  network_id = openstack_networking_network_v2.network_1.id
+
+  fixed_ip {
+    subnet_id = openstack_networking_subnet_v2.subnet_1.id
+  }
+}
+
+resource "openstack_networking_port_v2" "db_ports" {
+  count      = 2
+  name       = "port_db_${count.index + 1}"
+  network_id = openstack_networking_network_v2.network_1.id
+
+  fixed_ip {
+    subnet_id = openstack_networking_subnet_v2.subnet_1.id
   }
 }
 
