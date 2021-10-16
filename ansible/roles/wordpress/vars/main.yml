@@ -1,0 +1,7 @@
+# For wp-config
+db_user: client
+mariadb_root_password: changeme
+# Unix sockets?
+#db_host: '10.1.1.13:/var/run/mysqld/mysqld.sock'
+db_host: '10.1.1.13'
+# end wp-config

@@ -7,11 +7,6 @@
     group: root
     mode: 0644
 
-# - name: install pip
-#   apt:
-#     name: pip
-#     state: present
-
 - name: Add keys for repository
   apt_key:
     keyserver: hkp://keyserver.ubuntu.com:80
@@ -20,7 +15,6 @@
 
 - name: Install python module
   apt: name=python3-pymysql state=latest
-
 
 - name: Install MariaDB.
   apt:
@@ -45,16 +39,16 @@
     group: root
     mode: 0600
 
-- name: Instalamos el archivo de configuración de red.
+- name: Install network configuration file 
   template:
     src: settings.cnf.j2
     dest: /etc/mysql/mariadb.conf.d/settings.cnf
     owner: root
     group: root
     mode: 0644
-  notify: Reiniciar mariadb
+  notify: restart mariadb
 
-- name: Actualizamos la clave de root.
+- name: Create root user with password
   mysql_user:
     name: root
     host: "{{ item }}"
@@ -65,7 +59,6 @@
     - 127.0.0.1
     - ::1
     - localhost
-
 
 - name: Delete test database
   mysql_db:
@@ -82,94 +75,21 @@
   with_items:
     - localhost
 
-- name: Creamos las Bases de Datos.
+- name: Create databases
   mysql_db:
     name: "{{ item }}"
     state: present
+    check_hostname: no
     login_unix_socket: /var/run/mysqld/mysqld.sock
   with_items:
     - "{{ mariadb_databases }}"
 
 
-- name: Creamos los usuarios de Bases de Datos.
+- name: Grant access for all wordpress hosts
   mysql_user:
-    name: "{{ item.value.name }}"
-    password: "{{ item.value.password }}"
-    priv: "{{ item.value.priv }}"
+    name: "client"
+    password: "changeme"
+    host: "%"
+    priv: "*.*:ALL"
     state: present
     login_unix_socket: /var/run/mysqld/mysqld.sock
-  with_dict: "{{ mariadb_users }}"
-
-
-- name: Creamos el directorio de utilidades.
-  file:
-    path: "{{ mariadb_server_path_utiles }}"
-    state: directory
-    owner: root
-    group: root
-    mode: 0700
-  when: mariadb_utiles_bd
-
-# - name: Instalamos MySQLTuner.
-#   get_url:
-#     url: https://raw.githubusercontent.com/major/MySQLTuner-perl/master/mysqltuner.pl
-#     dest: "{{ mariadb_server_path_utiles }}/mysqltuner.pl"
-#     owner: root
-#     group: root
-#     mode: 0740
-#   when: mariadb_utiles_bd
-
-# - name: Instalamos el script de optimización de BD.
-#   template:
-#     src: optimiza_bd.sh.j2
-#     dest: "{{ mariadb_server_path_utiles }}/optimiza_bd_{{ item }}.sh"
-#     owner: root
-#     group: root
-#     mode: 0750
-#   with_items:
-#     - "{{ mariadb_databases }}"
-#   when: mariadb_utiles_bd
-
-# - name: Instalamos el script de backups de BD.
-#   template:
-#     src: copia_bd.sh.j2
-#     dest: "{{ mariadb_server_path_utiles }}/copia_bd_{{ item }}.sh"
-#     owner: root
-#     group: root
-#     mode: 0750
-#   with_items:
-#     - "{{ mariadb_databases }}"
-#   when: mariadb_utiles_bd
-
-# - name: Creamos el directorio de Backups de la BD.
-#   file:
-#     path: "{{ mariadb_path_backups }}"
-#     state: directory
-#     owner: root
-#     group: root
-#     mode: 0640
-#   when: mariadb_utiles_bd
-
-# - name: Añadimos las tareas cron del BackUp de BD.
-#   cron:
-#     name: "BackUp de BD {{ item }}"
-#     minute: "{{ mariadb_cron_backup_db.minute }}"
-#     hour: "{{ mariadb_cron_backup_db.hour }}"
-#     day: "{{ mariadb_cron_backup_db.day }}"
-#     weekday: "{{ mariadb_cron_backup_db.weekday }}"
-#     job: "{{ mariadb_server_path_utiles }}/copia_bd_{{ item }}.sh"
-#   with_items:
-#     - "{{ mariadb_databases }}"
-#   when: mariadb_cron_backup
-
-# - name: Añadimos las tareas cron de Optimización de BD.
-#   cron:
-#     name: "Optimización de BD {{ item }}"
-#     minute: "{{ mariadb_cron_optimiza_db.minute }}"
-#     hour: "{{ mariadb_cron_optimiza_db.hour }}"
-#     day: "{{ mariadb_cron_optimiza_db.day }}"
-#     weekday: "{{ mariadb_cron_optimiza_db.weekday }}"
-#     job: "{{ mariadb_server_path_utiles }}/optimiza_bd_{{ item }}.sh"
-#   with_items:
-#     - "{{ mariadb_databases }}"
-#   when: mariadb_cron_optimizacion
