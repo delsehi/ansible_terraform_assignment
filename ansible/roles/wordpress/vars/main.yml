@@ -1,7 +1,5 @@
-# For wp-config
+# Managed by Ansible
 db_user: client
+# TODO: Change dynamically
 mariadb_root_password: changeme
-# Unix sockets?
-#db_host: '10.1.1.13:/var/run/mysqld/mysqld.sock'
-db_host: '10.1.1.13'
-# end wp-config
+db_host: 'dbmaster1'

@@ -7,24 +7,7 @@ mariadb_root_password: changeme
 mariadb_databases:
  - wordpress
 
-mariadb_users: 
-# delete [] and define databases
-# TODO replication user och sånt
-  user1:
-    name: "root"
-    password: "changeme"
-    priv: "*.*:ALL"
-# user2:
-#    name: "usuario2"
-#    password: "clave2"
-#    priv: "db.table:priv1,priv2"
-# user3:
-#    name: "usuario3"
-#    password: "clave3"
-#    priv: "bdpruebas.*:ALL"
 
-
-# Delfi: Maybe bind should be something else. '127.0.0.1'
 mariadb_options:
   bind_address: '0.0.0.0'
   performance_schema: on

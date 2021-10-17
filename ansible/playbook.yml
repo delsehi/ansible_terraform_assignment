@@ -1,10 +1,15 @@
 ---
+- name: Upgrade and update packages and set host file
+  hosts: all
+  remote_user: ubuntu
+  roles:
+  - common
+
 - name: Install MariaDB
   hosts: dbmaster
   remote_user: ubuntu 
   become: yes
   roles: 
-  - common
   - mariadb
 
 - name: Install Wordpress and dependencies
@@ -14,5 +19,4 @@
   vars_files:
     - ./vars/wordpress.yml
   roles:
-    - common
     - wordpress
