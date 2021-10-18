@@ -8,6 +8,11 @@ data "openstack_networking_secgroup_v2" "default_secgroup" {
   name = "default"
 }
 
+# Get the id of the key pair
+data "openstack_compute_keypair_v2" "default_keypair" {
+  name = var.keypair  
+}
+
 # Create a private network
 resource "openstack_networking_network_v2" "network_1" {
   name           = "network_1"
@@ -126,4 +131,8 @@ resource "openstack_networking_floatingip_v2" "loadbalancer_fip" {
 resource "openstack_networking_floatingip_associate_v2" "fip_1" {
   floating_ip = openstack_networking_floatingip_v2.control_node_fip.address
   port_id     = openstack_networking_port_v2.control_node_port.id
+
+  depends_on = [
+    openstack_compute_instance_v2.control_node
+  ]
 }
