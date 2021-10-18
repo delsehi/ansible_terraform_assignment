@@ -1,0 +1,95 @@
+---
+- name: Add repository for MariaDB
+  template:
+    src: mariadb.list.j2
+    dest: /etc/apt/sources.list.d/mariadb.list
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Add keys for repository
+  apt_key:
+    keyserver: hkp://keyserver.ubuntu.com:80
+    id: '0xF1656F24C74CD1D8'
+    state: present
+
+- name: Install python module
+  apt: name=python3-pymysql state=latest
+
+- name: Install MariaDB.
+  apt:
+    name:
+      - mariadb-server
+      - mariadb-client
+    state: present
+    update_cache: yes
+    cache_valid_time: "{{ aptget_update_cache_valid_time }}"
+
+- name: Start and enable MariaDB service
+  service:
+    name: "{{ mariadb_service_name }}"
+    state: started
+    enabled: yes
+
+- name: Copy ~/.my.cnf to root.
+  template:
+    src: my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Install network configuration file 
+  template:
+    src: settings.cnf.j2
+    dest: /etc/mysql/mariadb.conf.d/settings.cnf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart mariadb
+
+- name: Create root user with password
+  mysql_user:
+    name: root
+    host: "{{ item }}"
+    password: "{{ mariadb_root_password }}"
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  with_items:
+    - 127.0.0.1
+    - ::1
+    - localhost
+
+- name: Delete test database
+  mysql_db:
+    name: test
+    state: absent
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Delete anonymous users
+  mysql_user:
+    name: ''
+    host: "{{ item }}"
+    state: absent
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  with_items:
+    - localhost
+
+- name: Create databases
+  mysql_db:
+    name: "{{ item }}"
+    state: present
+    check_hostname: no
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  with_items:
+    - "{{ mariadb_databases }}"
+
+
+- name: Grant access for all wordpress hosts
+  mysql_user:
+    name: "client"
+    password: "changeme"
+    host: "%"
+    priv: "*.*:ALL"
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock

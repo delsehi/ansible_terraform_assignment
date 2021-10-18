@@ -1,6 +1,6 @@
 #cloud-config
 package_update: true
-# package_upgrade: true
+package_upgrade: true
 packages:
   - ansible
   - python
@@ -8,15 +8,15 @@ packages:
 write_files:
   - content: |
       [db]
-      ${master_db_ip}
-      ${slave_db_ip}
+      dbmaster ansible_ssh_host=${master_db_ip}
+      dbslave ansible_ssh_host=${slave_db_ip}
 
       [fs]
-      ${file_server_ip}
+      fs ansible_ssh_host=${file_server_ip}
 
       [wp]
 %{ for node in wp_nodes ~}
-      ${node.network[0].fixed_ip_v4} 
+      ${node.name} ansible_ssh_host=${node.network[0].fixed_ip_v4} 
 %{ endfor ~}
     path: /etc/ansible/hosts
     append: true

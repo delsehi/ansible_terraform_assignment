@@ -17,3 +17,11 @@
     recurse: yes
     owner: www-data
     group: www-data
+
+- name: Setup wp-config
+  template:
+    src: "files/wp-config.php.j2"
+    dest: "/var/www/{{ domain_name }}/wordpress/wp-config.php"
+    mode: '0640'
+
+
