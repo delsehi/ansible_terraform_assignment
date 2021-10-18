@@ -8,7 +8,7 @@ packages:
 write_files:
   - content: |
       [local]
-      controlnode ansible_ssh_host=194.47.177.46
+      localhost ansible_ssh_host=localhost
 
       [db]
       dbmaster ansible_ssh_host=${master_db_ip}
