@@ -1,0 +1,5 @@
+# Managed by Ansible
+db_user: client
+# TODO: Change dynamically
+mariadb_root_password: changeme
+db_host: 'dbmaster1'
