@@ -7,6 +7,9 @@ packages:
   - unzip
 write_files:
   - content: |
+      [local]
+      controlnode ansible_ssh_host=194.47.177.46
+
       [db]
       dbmaster ansible_ssh_host=${master_db_ip}
       dbslave ansible_ssh_host=${slave_db_ip}

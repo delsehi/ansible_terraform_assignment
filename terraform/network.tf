@@ -3,6 +3,11 @@ data "openstack_networking_network_v2" "public_network" {
   name = "public"
 }
 
+# Get the id of the default sec group
+data "openstack_networking_secgroup_v2" "default_secgroup" {
+  name = "default"
+}
+
 # Create a private network
 resource "openstack_networking_network_v2" "network_1" {
   name           = "network_1"
@@ -44,7 +49,8 @@ resource "openstack_networking_port_v2" "control_node_port" {
   }
 
   security_group_ids = [
-    openstack_networking_secgroup_v2.ssh_secgroup.id
+    openstack_networking_secgroup_v2.ssh_secgroup.id,
+    data.openstack_networking_secgroup_v2.default_secgroup.id
   ]
 }
 
@@ -58,7 +64,8 @@ resource "openstack_networking_port_v2" "file_server_port" {
   }
 
   security_group_ids = [
-    openstack_networking_secgroup_v2.ssh_secgroup.id
+    openstack_networking_secgroup_v2.ssh_secgroup.id,
+    data.openstack_networking_secgroup_v2.default_secgroup.id
   ]
 }
 
@@ -73,7 +80,8 @@ resource "openstack_networking_port_v2" "wp_ports" {
   }
   security_group_ids = [
     openstack_networking_secgroup_v2.ssh_secgroup.id,
-    openstack_networking_secgroup_v2.http_secgroup.id
+    openstack_networking_secgroup_v2.http_secgroup.id,
+    data.openstack_networking_secgroup_v2.default_secgroup.id
   ]
 }
 
@@ -88,7 +96,9 @@ resource "openstack_networking_port_v2" "db_ports" {
   }
 
   security_group_ids = [
-    openstack_networking_secgroup_v2.ssh_secgroup.id
+    openstack_networking_secgroup_v2.ssh_secgroup.id,
+    data.openstack_networking_secgroup_v2.default_secgroup.id,
+    openstack_networking_secgroup_v2.db_secgroup.id
   ]
 }
 
