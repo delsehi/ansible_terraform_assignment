@@ -8,6 +8,11 @@ data "openstack_networking_secgroup_v2" "default_secgroup" {
   name = "default"
 }
 
+# Get the id of the key pair
+data "openstack_compute_keypair_v2" "default_keypair" {
+  name = var.keypair  
+}
+
 # Create a private network
 resource "openstack_networking_network_v2" "network_1" {
   name           = "network_1"
