@@ -1,17 +1,17 @@
 ---
-- name: Add repository for MariaDB
-  template:
-    src: mariadb.list.j2
-    dest: /etc/apt/sources.list.d/mariadb.list
-    owner: root
-    group: root
-    mode: 0644
+# - name: Add repository for MariaDB
+#   template:
+#     src: mariadb.list.j2
+#     dest: /etc/apt/sources.list.d/mariadb.list
+#     owner: root
+#     group: root
+#     mode: 0644
 
-- name: Add keys for repository
-  apt_key:
-    keyserver: hkp://keyserver.ubuntu.com:80
-    id: '0xF1656F24C74CD1D8'
-    state: present
+# - name: Add keys for repository
+#   apt_key:
+#     keyserver: hkp://keyserver.ubuntu.com:80
+#     id: '0xF1656F24C74CD1D8'
+#     state: present
 
 - name: Install python module
   apt: name=python3-pymysql state=latest
@@ -79,7 +79,7 @@
   mysql_db:
     name: "{{ item }}"
     state: present
-    check_hostname: no
+    # check_hostname: no
     login_unix_socket: /var/run/mysqld/mysqld.sock
   with_items:
     - "{{ mariadb_databases }}"
