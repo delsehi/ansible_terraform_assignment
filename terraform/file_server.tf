@@ -9,4 +9,8 @@ resource "openstack_compute_instance_v2" "file_server" {
   network {
     port = openstack_networking_port_v2.file_server_port.id
   }
+
+  depends_on = [
+    openstack_networking_router_interface_v2.router_interface
+  ]
 }
