@@ -3,14 +3,14 @@
   hosts: all
   remote_user: ubuntu
   roles:
-  - common
+    - common
 
 - name: Install MariaDB
   hosts: dbmaster
-  remote_user: ubuntu 
+  remote_user: ubuntu
   become: yes
-  roles: 
-  - mariadb
+  roles:
+    - mariadb
 
 - name: Install Wordpress and dependencies
   hosts: wp
@@ -20,3 +20,11 @@
     - ./vars/wordpress.yml
   roles:
     - wordpress
+
+- name: Install and set up nfs-server
+  hosts: fs
+  remote_user: ubuntu
+  become: yes
+
+  roles:
+    - fileserver
