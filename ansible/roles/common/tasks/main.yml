@@ -5,5 +5,15 @@
   become: true
   become_method: sudo
   apt: 
-    upgrade: full
+    # upgrade: full
     update_cache: true
+
+- name: Edit hosts file
+  become: yes
+  become_user: root
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: 0644

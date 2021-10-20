@@ -3,6 +3,16 @@ data "openstack_networking_network_v2" "public_network" {
   name = "public"
 }
 
+# Get the id of the default sec group
+data "openstack_networking_secgroup_v2" "default_secgroup" {
+  name = "default"
+}
+
+# Get the id of the key pair
+data "openstack_compute_keypair_v2" "default_keypair" {
+  name = var.keypair  
+}
+
 # Create a private network
 resource "openstack_networking_network_v2" "network_1" {
   name           = "network_1"
@@ -13,7 +23,7 @@ resource "openstack_networking_network_v2" "network_1" {
 resource "openstack_networking_subnet_v2" "subnet_1" {
   name       = "subnet_1"
   network_id = openstack_networking_network_v2.network_1.id
-  cidr       = "192.168.199.0/24"
+  cidr       = var.cidr
   ip_version = 4
 }
 
@@ -29,26 +39,100 @@ resource "openstack_networking_router_interface_v2" "router_interface" {
   subnet_id = openstack_networking_subnet_v2.subnet_1.id
 }
 
-# Create ssh security group
-resource "openstack_compute_secgroup_v2" "ssh_secgroup" {
-  name        = "ssh_secgroup"
-  description = "sceurity group for ssh, opens port 22 for tcp"
+#################################################################
+# Ports are created and connects compute instances to the network.
+# The security groups to be used are also added to the ports.
+##################################################################
 
-  rule {
-    from_port   = 22
-    to_port     = 22
-    ip_protocol = "tcp"
-    cidr        = "0.0.0.0/0"
+# Create port for the control node
+resource "openstack_networking_port_v2" "control_node_port" {
+  name       = "control_node_port"
+  network_id = openstack_networking_network_v2.network_1.id
+
+  fixed_ip {
+    subnet_id = openstack_networking_subnet_v2.subnet_1.id
   }
+
+  security_group_ids = [
+    openstack_networking_secgroup_v2.ssh_secgroup.id,
+    data.openstack_networking_secgroup_v2.default_secgroup.id
+  ]
 }
 
-# Create a floating ip
-resource "openstack_networking_floatingip_v2" "fip_1" {
+# Create port for the file server
+resource "openstack_networking_port_v2" "file_server_port" {
+  name       = "file_server_port"
+  network_id = openstack_networking_network_v2.network_1.id
+
+  fixed_ip {
+    subnet_id = openstack_networking_subnet_v2.subnet_1.id
+  }
+
+  security_group_ids = [
+    openstack_networking_secgroup_v2.ssh_secgroup.id,
+    data.openstack_networking_secgroup_v2.default_secgroup.id
+  ]
+}
+
+# Create ports for wordpress instances
+resource "openstack_networking_port_v2" "wp_ports" {
+  count      = var.wp_instances
+  name       = "wp_${count.index + 1}_port"
+  network_id = openstack_networking_network_v2.network_1.id
+
+  fixed_ip {
+    subnet_id = openstack_networking_subnet_v2.subnet_1.id
+  }
+  security_group_ids = [
+    openstack_networking_secgroup_v2.ssh_secgroup.id,
+    openstack_networking_secgroup_v2.http_secgroup.id,
+    data.openstack_networking_secgroup_v2.default_secgroup.id
+  ]
+}
+
+# Create ports for the databases
+resource "openstack_networking_port_v2" "db_ports" {
+  count      = 2
+  name       = "db_${count.index + 1}_port"
+  network_id = openstack_networking_network_v2.network_1.id
+
+  fixed_ip {
+    subnet_id = openstack_networking_subnet_v2.subnet_1.id
+  }
+
+  security_group_ids = [
+    openstack_networking_secgroup_v2.ssh_secgroup.id,
+    data.openstack_networking_secgroup_v2.default_secgroup.id,
+    openstack_networking_secgroup_v2.db_secgroup.id
+  ]
+}
+
+##############################################################
+# Floating ips are defined and associated to compute instances
+# or network resources
+##############################################################
+
+# Create a floating ip for control node
+resource "openstack_networking_floatingip_v2" "control_node_fip" {
   pool = "public"
 }
 
+# Create floating ip and connect to loadbalancer
+resource "openstack_networking_floatingip_v2" "loadbalancer_fip" {
+  pool    = "public"
+  port_id = openstack_lb_loadbalancer_v2.loadbalancer.vip_port_id
+
+  depends_on = [
+    openstack_lb_listener_v2.listener
+  ]
+}
+
 # Connect floating ip to control node
-resource "openstack_compute_floatingip_associate_v2" "fip_1" {
-  floating_ip = openstack_networking_floatingip_v2.fip_1.address
-  instance_id = openstack_compute_instance_v2.control_node.id
+resource "openstack_networking_floatingip_associate_v2" "fip_1" {
+  floating_ip = openstack_networking_floatingip_v2.control_node_fip.address
+  port_id     = openstack_networking_port_v2.control_node_port.id
+
+  depends_on = [
+    openstack_compute_instance_v2.control_node
+  ]
 }

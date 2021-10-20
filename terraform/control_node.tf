@@ -18,11 +18,10 @@ resource "openstack_compute_instance_v2" "control_node" {
   image_name        = "Ubuntu server 20.04"
   flavor_name       = "c1-r2-d5"
   availability_zone = "Education"
-  key_pair          = var.keypair
-  security_groups   = ["default", "${openstack_compute_secgroup_v2.ssh_secgroup.id}"]
+  key_pair          = data.openstack_compute_keypair_v2.default_keypair.id
 
   network {
-    name = "network_1"
+    port = openstack_networking_port_v2.control_node_port.id
   }
 
   user_data = templatefile("./templates/cn_config.tpl", local.install_ansible)
@@ -30,6 +29,6 @@ resource "openstack_compute_instance_v2" "control_node" {
 
 # Outputs the floating ip of the control node
 output "public_ip" {
-  value       = openstack_networking_floatingip_v2.fip_1.address
+  value       = openstack_networking_floatingip_v2.control_node_fip.address
   description = "The public ip address of the server"
 }

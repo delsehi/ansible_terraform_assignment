@@ -1,5 +1,6 @@
 keypair      = "ev222ie_Keypair"
 wp_instances = 3
+cidr         = "10.1.1.0/24"
 private_key  = "/Users/elias/.ssh/2dv517.pem"
 public_key   = "/Users/elias/.ssh/2dv517_pub.pem"
 git_access_token = "6p-DwdQmQmtjzyV8zN76"

@@ -1,23 +1,16 @@
 ---
-- name: Install and set up nfs-server
-  hosts: fs
+- name: Upgrade and update packages and set host file
+  hosts: all
   remote_user: ubuntu
-  become: yes
-
-  roles:
-    - common
-    - fileserver
-
-- name: Install MySQL and other things
-  hosts: wordpress
-  remote_user: ubuntu
-  become: yes # Maybe needed?
-
   roles:
   - common
-  - dbmaster
-  - dbslave
-  - fileclient
+
+- name: Install MariaDB
+  hosts: dbmaster
+  remote_user: ubuntu 
+  become: yes
+  roles: 
+  - mariadb
 
 - name: Install Wordpress and dependencies
   hosts: wp
@@ -25,8 +18,5 @@
   become: yes
   vars_files:
     - ./vars/wordpress.yml
-
   roles:
-    - common
     - wordpress
-    - fileclient
