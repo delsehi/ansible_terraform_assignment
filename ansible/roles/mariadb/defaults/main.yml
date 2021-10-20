@@ -6,30 +6,6 @@ mariadb_secure_installation: True
 
 mariadb_root_password: changeme
 
-mariadb_server_path_utiles: /root/utiles
-
-mariadb_path_backups: /home/db_backups/
-
-mariadb_databases: []
-# delete [] and define databases
-# - database1
-# - database2
-
-mariadb_users: []
-# delete [] and define databases
-# user1:
-#    name: "usuario1"
-#    password: "clave1"
-#    priv: "*.*:ALL"
-# user2:
-#    name: "usuario2"
-#    password: "clave2"
-#    priv: "db.table:priv1,priv2"
-# user3:
-#    name: "usuario3"
-#    password: "clave3"
-#    priv: "bdpruebas.*:ALL"
-
 mariadb_options:
   bind_address: '127.0.0.1'
   performance_schema: on
@@ -57,20 +33,6 @@ mariadb_options:
   log_slow_admin_statements: true
   log_queries_not_using_indexes: true
 
-mariadb_utiles_bd: false
-mariadb_cron_backup: false
-mariadb_cron_optimizacion: false
 
-mariadb_cron_backup_db:
-  minute: "15"
-  hour: "3"
-  day: "*"
-  weekday: "*"
-
-mariadb_cron_optimiza_db:
-  minute: "1"
-  hour: "3"
-  day: "*"
-  weekday: "0"
 
 aptget_update_cache_valid_time: 3600
