@@ -1,0 +1,3 @@
+---
+- name: Set up nfs-server
+  include_tasks: nfsserver.yml
