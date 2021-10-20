@@ -18,6 +18,9 @@ variable "cidr" {
   type = string
 }
 variable "private_key" {
+  type = string # Path to your private ssh key for cscloud, used for terraform ssh connection
+}
+variable "private_key_formatted" {
   type = string # Path to your private ssh key for cscloud, this will be added to the control_node
 }
 variable "public_key" {

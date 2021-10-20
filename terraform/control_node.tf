@@ -1,7 +1,7 @@
 # Declare variables needed to install and configure Ansible on control node
 locals {
   install_ansible = {
-    private_key    = file(var.private_key),
+    private_key    = file(var.private_key_formatted),
     public_key     = file(var.public_key),
     master_db_ip   = openstack_compute_instance_v2.db_master.network[0].fixed_ip_v4,
     slave_db_ip    = openstack_compute_instance_v2.db_slave.network[0].fixed_ip_v4,
