@@ -60,6 +60,24 @@
     - ::1
     - localhost
 
+- name: Create replication account 
+  mysql_user:
+    name: repl
+    host: "%"
+    password: "{{ mariadb_repl_password }}"
+    state: present
+    priv: "*.*:REPLICATION SLAVE" # ability to read binary log events from master
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Create read-write user
+  mysql_user: 
+    name: rwuser
+    host: "%"
+    password: "{{ mariadb_rwuser_password }}"
+    state: present
+    priv: "*.*:SELECT,INSERT,UPDATE,DELETE,CREATE,DROP"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
 - name: Delete test database
   mysql_db:
     name: test
@@ -93,3 +111,4 @@
     priv: "*.*:ALL"
     state: present
     login_unix_socket: /var/run/mysqld/mysqld.sock
+

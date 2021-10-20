@@ -5,6 +5,8 @@ mariadb_service_name: mysql
 mariadb_secure_installation: True
 
 mariadb_root_password: changeme
+mariadb_repl_password: ishouldbecreatedsomewhere
+mariadb_rwuser_password: pleasechangeme
 
 mariadb_options:
   bind_address: '127.0.0.1'

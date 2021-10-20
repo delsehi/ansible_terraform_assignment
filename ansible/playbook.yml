@@ -6,11 +6,17 @@
     - common
 
 - name: Install MariaDB
-  hosts: dbmaster
+  hosts: dbmaster, dbslave
   remote_user: ubuntu
   become: yes
   roles:
     - mariadb
+- name: configure master server
+  hosts: dbmaster
+  remote_user: ubuntu
+  become: yes
+  roles:
+   - dbmaster
 
 - name: Install Wordpress and dependencies
   hosts: wp
@@ -25,6 +31,5 @@
   hosts: fs
   remote_user: ubuntu
   become: yes
-
   roles:
     - fileserver
