@@ -24,6 +24,10 @@ resource "openstack_compute_instance_v2" "control_node" {
     port = openstack_networking_port_v2.control_node_port.id
   }
 
+  depends_on = [
+    openstack_networking_router_interface_v2.router_interface
+  ]
+
   user_data = templatefile("./templates/cn_config.tpl", local.install_ansible)
 }
 

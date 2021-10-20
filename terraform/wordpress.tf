@@ -10,4 +10,9 @@ resource "openstack_compute_instance_v2" "wordpress" {
   network {
     port = openstack_networking_port_v2.wp_ports[count.index].id
   }
+
+  depends_on = [
+    openstack_networking_router_interface_v2.router_interface,
+    openstack_lb_pool_v2.pool
+  ]
 }

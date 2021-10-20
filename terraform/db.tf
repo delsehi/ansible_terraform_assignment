@@ -9,6 +9,10 @@ resource "openstack_compute_instance_v2" "db_master" {
   network {
     port = openstack_networking_port_v2.db_ports[0].id
   }
+
+  depends_on = [
+    openstack_networking_router_interface_v2.router_interface
+  ]
 }
 
 # Create database slave node
@@ -22,4 +26,8 @@ resource "openstack_compute_instance_v2" "db_slave" {
   network {
     port = openstack_networking_port_v2.db_ports[1].id
   }
+  
+  depends_on = [
+    openstack_networking_router_interface_v2.router_interface
+  ]
 }
