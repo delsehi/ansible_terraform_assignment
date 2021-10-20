@@ -1,4 +1,12 @@
 ---
+- name: Transfer backup sql file
+  ansible.builtin.copy:
+    src: /home/ubuntu/backup.sql
+    dest: /home/ubuntu/backup.sql
+    owner: root
+    group: root
+    mode: 0600
+
 - name: Install python module
   apt: name=python3-pymysql state=latest
 
