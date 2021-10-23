@@ -14,4 +14,6 @@ resource "openstack_networking_port_v2" "port" {
   fixed_ip {
     subnet_id = var.subnet_id
   }
+
+  security_group_ids = var.secgroup_ids
 }

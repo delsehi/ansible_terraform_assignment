@@ -1,8 +1,9 @@
 module "vm1" {
   source = "./modules/compute"
 
-  name    = "vm1"
+  name    = "Super"
   port_id = module.port.id
+  keypair = var.keypair
 
 }
 
@@ -23,10 +24,10 @@ module "subnet" {
 module "port" {
   source = "./modules/network/port"
 
-  name       = "port"
-  network_id = module.network.id
-  subnet_id  = module.subnet.id
-
+  name         = "port"
+  network_id   = module.network.id
+  subnet_id    = module.subnet.id
+  secgroup_ids = [module.ssh_secgroup.id]
 }
 
 module "router" {
@@ -47,4 +48,13 @@ module "floating_ip" {
   source = "./modules/network/floating_ip"
 
   port_id = module.port.id
+}
+
+module "ssh_secgroup" {
+  source = "./modules/network/security_group"
+
+  name      = "ssh"
+  direction = "ingress"
+  port_min  = 22
+  port_max  = 22
 }
