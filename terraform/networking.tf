@@ -14,7 +14,7 @@ module "port" {
   name         = "port_${count.index + 1}"
   network_id   = module.network.network_id
   subnet_id    = module.network.subnet_id
-  secgroup_ids = [module.ssh_secgroup.id]
+  secgroup_ids = [module.ssh_secgroup.id, module.http_secgroup.id]
 }
 
 # Create loadbalancer floating ip
@@ -31,4 +31,14 @@ module "ssh_secgroup" {
   direction = "ingress"
   port_min  = 22
   port_max  = 22
+}
+
+# Create http security group
+module "http_secgroup" {
+  source = "./modules/network/security_group"
+
+  name      = "http"
+  direction = "ingress"
+  port_min  = 80
+  port_max  = 80
 }
