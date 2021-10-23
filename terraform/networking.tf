@@ -6,8 +6,17 @@ module "network" {
   cidr = var.cidr
 }
 
-# Create ports
-module "port" {
+module "control_node_port" {
+  source = "./modules/network/port"
+
+  name         = "control_node_port"
+  network_id   = module.network.network_id
+  subnet_id    = module.network.subnet_id
+  secgroup_ids = [module.ssh_secgroup.id]
+}
+
+# Create wordpress ports
+module "wordpress_port" {
   source = "./modules/network/port"
 
   count        = var.wp_instances
@@ -17,10 +26,35 @@ module "port" {
   secgroup_ids = [module.ssh_secgroup.id, module.http_secgroup.id]
 }
 
+module "database_port" {
+  source = "./modules/network/port"
+
+  count        = 2
+  name         = "db_port_${count.index + 1}"
+  network_id   = module.network.network_id
+  subnet_id    = module.network.subnet_id
+  secgroup_ids = [module.ssh_secgroup.id]
+}
+
+module "fileserver_port" {
+  source = "./modules/network/port"
+
+  name         = "fileserver_port"
+  network_id   = module.network.network_id
+  subnet_id    = module.network.subnet_id
+  secgroup_ids = [module.ssh_secgroup.id]
+}
+
 # Create loadbalancer floating ip
 module "loadbalancer_floating_ip" {
   source  = "./modules/network/floating_ip"
   port_id = module.loadbalancer.port_id
+}
+
+# Create loadbalancer floating ip
+module "control_node_floating_ip" {
+  source  = "./modules/network/floating_ip"
+  port_id = module.control_node_port.id
 }
 
 # Create ssh security group
