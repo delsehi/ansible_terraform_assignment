@@ -1,10 +1,19 @@
+terraform {
+  required_providers {
+    openstack = {
+      source  = "terraform-provider-openstack/openstack"
+      version = "1.44.0"
+    }
+  }
+}
+
 # Create loadbalancer
 resource "openstack_lb_loadbalancer_v2" "loadbalancer" {
   name          = "loadbalancer"
-  vip_subnet_id = openstack_networking_subnet_v2.subnet_1.id
+  vip_subnet_id = var.subnet_1.id
 
   security_group_ids = [
-    openstack_networking_secgroup_v2.http_secgroup.id
+    var.http_secgroup.id
   ]
 }
 
@@ -28,13 +37,23 @@ resource "openstack_lb_pool_v2" "pool" {
 resource "openstack_lb_member_v2" "member" {
   count     = var.wp_instances
   pool_id   = openstack_lb_pool_v2.pool.id
-  subnet_id = openstack_networking_subnet_v2.subnet_1.id
+  subnet_id = var.subnet_1.id
 
-  address       = openstack_compute_instance_v2.wordpress[count.index].access_ip_v4
+  address       = var.wordpress[count.index].access_ip_v4
   protocol_port = 80
 }
 
-output "loadbalancer_ip" {
-  value       = openstack_networking_floatingip_v2.loadbalancer_fip.address
-  description = "ip of loadbalancer"
+# Create floating ip and connect to loadbalancer
+resource "openstack_networking_floatingip_v2" "loadbalancer_fip" {
+  pool    = "public"
+  port_id = openstack_lb_loadbalancer_v2.loadbalancer.vip_port_id
+
+  depends_on = [
+    # openstack_lb_listener_v2.listener
+  ]
 }
+
+# output "loadbalancer_ip" {
+#   value       = var.loadbalancer_floating_ip.address
+#   description = "ip of loadbalancer"
+# }

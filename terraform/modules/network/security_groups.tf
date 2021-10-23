@@ -1,3 +1,8 @@
+# Get the id of the default sec group
+data "openstack_networking_secgroup_v2" "default_secgroup" {
+  name = "default"
+}
+
 # Create ssh security group
 resource "openstack_networking_secgroup_v2" "ssh_secgroup" {
   name        = "ssh_secgroup"
