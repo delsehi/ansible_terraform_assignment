@@ -1,65 +1,44 @@
+module "vm1" {
+  source = "./modules/compute"
+
+  name    = "vm1"
+  port_id = module.port.id
+
+}
+
 module "network" {
   source = "./modules/network"
 
-  # Dependencies
-  loadbalancer = module.loadbalancer.loadbalancer
-  control_node = module.control_node.control_node
-
-  # Input variables
-  wp_instances = var.wp_instances
-  keypair      = var.keypair
-  cidr         = var.cidr
+  name = "network_1"
 }
 
-module "loadbalancer" {
-  source = "./modules/loadbalancer"
+module "subnet" {
+  source = "./modules/network/subnet"
 
-  wp_instances  = var.wp_instances
-  wordpress     = module.application.wordpress
-  subnet_1      = module.network.subnet_1
-  ssh_secgroup  = module.network.ssh_secgroup
-  http_secgroup = module.network.http_secgroup
-  # loadbalancer_floating_ip = module.network.loadbalancer_floating_ip
+  name       = "subnet_1"
+  network_id = module.network.id
+  cidr       = var.cidr
+}
+
+module "port" {
+  source = "./modules/network/port"
+
+  name       = "port"
+  network_id = module.network.id
+  subnet_id  = module.subnet.id
 
 }
 
-module "control_node" {
-  source = "./modules/control_node"
+module "router" {
+  source = "./modules/network/router"
 
-  # Dependencies
-  # ports            = module.network.ports
-  network          = module.network.network_1
-  router_interface = module.network.router_interface
-  ssh_secgroup     = module.network.ssh_secgroup
-
-  # Input variables
-  # wp_instances     = var.wp_instances
-  keypair          = var.keypair
-  private_key      = var.private_key
-  public_key       = var.public_key
-  git_access_token = var.git_access_token
-  git_api_url      = var.git_api_url
-  db_master        = module.application.db_master
-  db_slave         = module.application.db_slave
-  file_server      = module.application.file_server
-  wordpress        = module.application.wordpress
+  name = "public_router"
 }
 
-module "application" {
-  source = "./modules/application"
+module "router_interface" {
+  source = "./modules/network/router_interface"
 
-  # Dependencies
-  # ports            = module.network.ports
-  network          = module.network.network_1
-  router_interface = module.network.router_interface
-  ssh_secgroup     = module.network.ssh_secgroup
-  http_secgroup    = module.network.http_secgroup
+  router_id = module.router.id
+  subnet_id = module.subnet.id
 
-  # Input variables
-  wp_instances = var.wp_instances
-  keypair      = var.keypair
-}
-
-output "control_node_" {
-  value = module.control_node.control_node.network
 }
