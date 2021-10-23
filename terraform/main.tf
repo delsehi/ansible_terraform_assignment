@@ -8,6 +8,5 @@ module "loadbalancer" {
 }
 
 output "wordpress" {
-  # count = var.wp_instances
   value = module.wordpress[*].internal_ip
 }

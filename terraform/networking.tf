@@ -6,15 +6,6 @@ module "network" {
   cidr = var.cidr
 }
 
-# # Create subnet
-# module "subnet" {
-#   source = "./modules/network/subnet"
-
-#   name       = "subnet_1"
-#   network_id = module.network.id
-#   cidr       = var.cidr
-# }
-
 # Create ports
 module "port" {
   source = "./modules/network/port"
@@ -25,22 +16,6 @@ module "port" {
   subnet_id    = module.network.subnet_id
   secgroup_ids = [module.ssh_secgroup.id]
 }
-
-# # Create router
-# module "router" {
-#   source = "./modules/network/router"
-
-#   name = "public_router"
-# }
-
-# # Create router interface
-# module "router_interface" {
-#   source = "./modules/network/router_interface"
-
-#   router_id = module.router.id
-#   subnet_id = module.subnet.id
-
-# }
 
 # Create loadbalancer floating ip
 module "loadbalancer_floating_ip" {
