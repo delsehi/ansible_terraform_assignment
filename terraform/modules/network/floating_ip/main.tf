@@ -8,7 +8,8 @@ terraform {
 }
 
 resource "openstack_networking_floatingip_v2" "floating_ip" {
-  pool = "public"
+  pool    = "public"
+  port_id = var.port_id
 }
 
 resource "openstack_networking_floatingip_associate_v2" "floating_ip_associate" {

@@ -41,11 +41,10 @@ module "router_interface" {
 
 }
 
-# Create floating ip
-module "floating_ip" {
+# Create loadbalancer floating ip
+module "loadbalancer_floating_ip" {
   source  = "./modules/network/floating_ip"
-  count   = var.wp_instances
-  port_id = module.port[count.index].id
+  port_id = module.loadbalancer.port_id
 }
 
 # Create ssh security group
