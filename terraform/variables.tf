@@ -29,3 +29,16 @@ variable "git_access_token" {
 variable "git_api_url" {
   type = string # Url to gitlab api endpoint to download repo
 }
+
+locals {
+  install_ansible = {
+    private_key    = file(var.private_key),
+    public_key     = file(var.public_key),
+    master_db_ip   = module.database[0].internal_ip,
+    slave_db_ip    = module.database[1].internal_ip,
+    file_server_ip = module.fileserver.internal_ip,
+    wp_nodes       = module.wordpress,
+    access_token   = var.git_access_token,
+    api_url        = var.git_api_url,
+  }
+}

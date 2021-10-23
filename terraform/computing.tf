@@ -2,9 +2,10 @@
 module "control_node" {
   source = "./modules/compute"
 
-  name    = "control_node"
-  port_id = module.control_node_port.id
-  keypair = var.keypair
+  name      = "control_node"
+  port_id   = module.control_node_port.id
+  keypair   = var.keypair
+  user_data = templatefile("./templates/cn_config.tpl", local.install_ansible)
 }
 
 
