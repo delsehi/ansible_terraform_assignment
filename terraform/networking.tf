@@ -2,17 +2,18 @@
 module "network" {
   source = "./modules/network"
 
-  name = "network_1"
+  name = "1"
+  cidr = var.cidr
 }
 
-# Create subnet
-module "subnet" {
-  source = "./modules/network/subnet"
+# # Create subnet
+# module "subnet" {
+#   source = "./modules/network/subnet"
 
-  name       = "subnet_1"
-  network_id = module.network.id
-  cidr       = var.cidr
-}
+#   name       = "subnet_1"
+#   network_id = module.network.id
+#   cidr       = var.cidr
+# }
 
 # Create ports
 module "port" {
@@ -20,26 +21,26 @@ module "port" {
 
   count        = var.wp_instances
   name         = "port_${count.index + 1}"
-  network_id   = module.network.id
-  subnet_id    = module.subnet.id
+  network_id   = module.network.network_id
+  subnet_id    = module.network.subnet_id
   secgroup_ids = [module.ssh_secgroup.id]
 }
 
-# Create router
-module "router" {
-  source = "./modules/network/router"
+# # Create router
+# module "router" {
+#   source = "./modules/network/router"
 
-  name = "public_router"
-}
+#   name = "public_router"
+# }
 
-# Create router interface
-module "router_interface" {
-  source = "./modules/network/router_interface"
+# # Create router interface
+# module "router_interface" {
+#   source = "./modules/network/router_interface"
 
-  router_id = module.router.id
-  subnet_id = module.subnet.id
+#   router_id = module.router.id
+#   subnet_id = module.subnet.id
 
-}
+# }
 
 # Create loadbalancer floating ip
 module "loadbalancer_floating_ip" {
