@@ -42,3 +42,9 @@ module "router_interface" {
   subnet_id = module.subnet.id
 
 }
+
+module "floating_ip" {
+  source = "./modules/network/floating_ip"
+
+  port_id = module.port.id
+}
