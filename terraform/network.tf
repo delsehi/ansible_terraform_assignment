@@ -10,7 +10,7 @@ data "openstack_networking_secgroup_v2" "default_secgroup" {
 
 # Get the id of the key pair
 data "openstack_compute_keypair_v2" "default_keypair" {
-  name = var.keypair  
+  name = var.keypair
 }
 
 # Create a private network
