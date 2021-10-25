@@ -1,19 +1,25 @@
 ---
-- name: install nfs-server
-  apt: 
+- name: Install nfs-server
+  apt:
     name: nfs-kernel-server
 
-- name: create directory to be shared
+- name: Create directory to be shared
   file:
     path: /mnt/sharedfiles
     state: directory
     owner: nobody
     group: nogroup
     mode: 0777
-    
+
+- name: Transfer wp-content directory
+  synchronize:
+    src: /home/ubuntu/acme_wordpress_files/wp-content
+    dest: /mnt/sharedfiles/
+    owner: yes
+
 - name: Copy export file
   copy:
-    content: /mnt/sharedfiles 192.168.0.0/16(rw,sync,no_subtree_check)
+    content: /mnt/sharedfiles/wp-content wordpress_*(rw,sync,no_subtree_check,no_root_squash)
     dest: /etc/exports
     owner: root
     group: root
@@ -24,4 +30,3 @@
 
 - name: Reboot nfs server
   shell: systemctl restart nfs-kernel-server
-...
