@@ -19,12 +19,11 @@
   become: yes
   community.mysql.mysql_replication:
     login_unix_socket: /var/run/mysqld/mysqld.sock
-    mode: changemaster
-    master_host: dbmaster
-    master_user: repl
-    master_id: 1
-    master_password: '{{ mariadb_repl_password }}'
-    master_use_gtid: current_pos
+    mode: changeprimary
+    primary_host: dbmaster
+    primary_user: repl
+    primary_password: '{{ mariadb_repl_password }}'
+    primary_use_gtid: current_pos
 
 - name: Run start replica and fail the task on errors
   community.mysql.mysql_replication:

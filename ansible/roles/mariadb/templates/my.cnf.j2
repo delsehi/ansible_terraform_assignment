@@ -11,7 +11,9 @@ socket = /var/run/mysqld/mysqld.sock
 
 
 [mariadb]
-log-bin
+log-bin = /var/log/mysql/mysql-bin.log
+log_bin = /var/log/mysql/mysql-bin.log
 server_id=1
-log-basename=master1
+log-bin-basename = /var/log/mysql/mysql-bin.log
+log_bin_basename = /var/log/mysql/mysql-bin.log
 binlog-format=mixed
