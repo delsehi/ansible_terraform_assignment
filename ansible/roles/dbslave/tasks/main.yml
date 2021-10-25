@@ -1,10 +1,10 @@
 
 - name: Modify configuration file to setup server ID
-  lineinfile: dest=/etc/mysql/my.cnf regexp="^#server-id" line="server-id=2"
+  lineinfile: dest=/etc/mysql/my.cnf regexp="^#server-id" line="server_id=2"
 
 - name: Setup replication
   become: yes
-  command: /usr/bin/mysql -uroot -e "CHANGE MASTER TO master_host='dbmaster', master_user='repl', master_password='lper', master_use_gtid=current_pos"
+  command: /usr/bin/mysql -uroot -e "CHANGE MASTER TO master_host='dbmaster', master_user='repl', master_password='{{ mariadb_repl_password }}', master_use_gtid=current_pos"
 
 - name: Restart mysql service
   service: name=mysql state=restarted

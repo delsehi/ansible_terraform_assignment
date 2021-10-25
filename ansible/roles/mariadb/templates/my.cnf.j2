@@ -8,9 +8,10 @@ password={{ mariadb_root_password }}
 #skip-networking=0
 #skip-bind-address
 socket = /var/run/mysqld/mysqld.sock
+log-bin=bin.log
+log-bin-index=bin-log.index
+max_binlog_size=100M
+binlog_format=row
 
 [mariadb]
 server_id=1
-log-bin
-log-basename=dbmaster
-binlog-format=mixed

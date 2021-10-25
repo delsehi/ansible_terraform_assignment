@@ -2,5 +2,11 @@
 - name: Restart mysql service
   service: name=mysql state=restarted
 
-- name: Reset master binlog
-  command: /usr/bin/mysql -u root -e "RESET MASTER"
+- name: Flush tables 
+  command: /usr/bin/mysql -u root -e "FLUSH TABLES WITH READ LOCK"
+
+- name: Purge tables
+  command: /usr/bin/mysql -u root -e "PURGE BINARY LOGS TO 'mariadb-bin.000666'"
+
+# - name: Reset master binlog
+#   command: /usr/bin/mysql -u root -e "RESET MASTER"
