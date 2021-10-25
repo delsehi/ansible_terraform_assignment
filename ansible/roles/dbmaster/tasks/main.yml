@@ -2,11 +2,12 @@
 - name: Restart mysql service
   service: name=mysql state=restarted
 
-- name: Flush tables 
-  command: /usr/bin/mysql -u root -e "FLUSH TABLES WITH READ LOCK"
+- name: Run RESET MASTER command which will delete all existing binary log files
+  community.mysql.mysql_replication:
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    mode: resetprimary
 
-- name: Purge tables
-  command: /usr/bin/mysql -u root -e "PURGE BINARY LOGS TO 'mariadb-bin.000666'"
-
-# - name: Reset master binlog
-#   command: /usr/bin/mysql -u root -e "RESET MASTER"
+- name: Get primary binlog file name and binlog position
+  community.mysql.mysql_replication:
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    mode: getprimary

@@ -2,9 +2,34 @@
 - name: Modify configuration file to setup server ID
   lineinfile: dest=/etc/mysql/my.cnf regexp="^#server-id" line="server_id=2"
 
+# - name: Stop slave first
+#   become: yes
+#   command: /usr/bin/mysql -uroot -e "STOP SLAVE"
+
+# - name: Setup replication
+#   become: yes
+#   command: /usr/bin/mysql -uroot -e "CHANGE MASTER TO master_host='dbmaster', master_user='repl', master_password='{{ mariadb_repl_password }}', master_use_gtid=current_pos"
+- name: Stop mysql replica thread
+  community.mysql.mysql_replication:
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    mode: stopreplica
+
+
 - name: Setup replication
   become: yes
-  command: /usr/bin/mysql -uroot -e "CHANGE MASTER TO master_host='dbmaster', master_user='repl', master_password='{{ mariadb_repl_password }}', master_use_gtid=current_pos"
+  community.mysql.mysql_replication:
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    mode: changemaster
+    master_host: dbmaster
+    master_user: repl
+    master_id: 1
+    master_password: '{{ mariadb_repl_password }}'
+    master_use_gtid: current_pos
+
+- name: Run start replica and fail the task on errors
+  community.mysql.mysql_replication:
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    mode: startreplica
 
 - name: Restart mysql service
   service: name=mysql state=restarted
