@@ -31,24 +31,3 @@ resource "openstack_compute_instance_v2" "db_slave" {
     openstack_networking_router_interface_v2.router_interface
   ]
 }
-
-# Transfer sql dump file to control node where ansible will use it
-resource "null_resource" transfer_backupsql {
-
-  provisioner "file" {
-    source      = "./files/backup.sql"
-    destination = "/home/ubuntu/backup.sql"
-  }
-
-  connection {
-    host     = "${openstack_networking_floatingip_v2.control_node_fip.address}"
-    type     = "ssh"
-    user     = "ubuntu"
-    private_key = file(var.private_key)
-    agent    = "false"
-  }
-
-  depends_on = [
-    openstack_networking_floatingip_associate_v2.fip_1,
-  ]
-}
