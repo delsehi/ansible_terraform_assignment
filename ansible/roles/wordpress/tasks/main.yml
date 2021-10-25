@@ -1,17 +1,21 @@
 ---
 - name: Create document root
   file:
-    path: "/var/www/{{ domain_name }}"
+    path: '/var/www/{{ domain_name }}'
     state: directory
-    owner: "www-data"
-    group: "www-data"
+    owner: 'www-data'
+    group: 'www-data'
     mode: '0755'
+
+- name: Install nfs-common
+  apt:
+    name: nfs-common
 
 - name: Include php.yml
   include_tasks: php.yml
 
 - name: Include apache.yml
   include_tasks: apache.yml
-  
+
 - name: Include wordpress.yml
   include_tasks: wordpress.yml
