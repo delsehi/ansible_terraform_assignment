@@ -87,3 +87,6 @@ openrc.sh
 clouds.yaml
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,terraform,macos
 
+# File folder
+/files/*
+!/files/.gitkeep
