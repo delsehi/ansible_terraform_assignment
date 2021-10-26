@@ -6,3 +6,5 @@ module "loadbalancer" {
   secgroup_ids = [module.ssh_secgroup.id, module.http_secgroup.id]
   members      = module.wordpress[*].internal_ip
 }
+
+

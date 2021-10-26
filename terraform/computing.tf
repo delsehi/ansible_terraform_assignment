@@ -1,4 +1,13 @@
 # Create control node instance
+module "loadbalancer" {
+  source = "./modules/loadbalancer"
+
+  name         = "loadbalancer"
+  subnet_id    = module.network.subnet_id
+  secgroup_ids = [module.ssh_secgroup.id, module.http_secgroup.id]
+  members      = module.wordpress[*].internal_ip
+}
+
 module "control_node" {
   source = "./modules/compute"
 
