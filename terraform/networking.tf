@@ -9,49 +9,67 @@ module "network" {
 module "control_node_port" {
   source = "./modules/network/port"
 
-  name         = "control_node_port"
-  network_id   = module.network.network_id
-  subnet_id    = module.network.subnet_id
-  secgroup_ids = [module.ssh_secgroup.id]
+  name       = "control_node_port"
+  network_id = module.network.network_id
+  subnet_id  = module.network.subnet_id
+
+  secgroup_ids = [
+    module.ssh_secgroup.id
+  ]
 }
 
 # Create wordpress ports
 module "wordpress_port" {
   source = "./modules/network/port"
 
-  count        = var.wp_instances
-  name         = "port_${count.index + 1}"
-  network_id   = module.network.network_id
-  subnet_id    = module.network.subnet_id
-  secgroup_ids = [module.ssh_secgroup.id, module.http_secgroup.id]
+  count      = var.wp_instances
+  name       = "port_${count.index + 1}"
+  network_id = module.network.network_id
+  subnet_id  = module.network.subnet_id
+
+  secgroup_ids = [
+    module.ssh_secgroup.id,
+    module.http_secgroup.id
+  ]
 }
 
 module "database_port" {
   source = "./modules/network/port"
 
-  count        = 2
-  name         = "db_port_${count.index + 1}"
-  network_id   = module.network.network_id
-  subnet_id    = module.network.subnet_id
-  secgroup_ids = [module.ssh_secgroup.id]
+  count      = 2
+  name       = "db_port_${count.index + 1}"
+  network_id = module.network.network_id
+  subnet_id  = module.network.subnet_id
+
+  secgroup_ids = [
+    module.ssh_secgroup.id,
+    module.database_secgroup.id
+  ]
 }
 
 module "fileserver_port" {
   source = "./modules/network/port"
 
-  name         = "fileserver_port"
-  network_id   = module.network.network_id
-  subnet_id    = module.network.subnet_id
-  secgroup_ids = [module.ssh_secgroup.id]
+  name       = "fileserver_port"
+  network_id = module.network.network_id
+  subnet_id  = module.network.subnet_id
+
+  secgroup_ids = [
+    module.ssh_secgroup.id
+  ]
 }
 
 # Create loadbalancer floating ip
 module "loadbalancer_floating_ip" {
   source  = "./modules/network/floating_ip"
   port_id = module.loadbalancer.port_id
+
+  depends_on = [
+    module.loadbalancer
+  ]
 }
 
-# Create loadbalancer floating ip
+# Create control node floating ip
 module "control_node_floating_ip" {
   source  = "./modules/network/floating_ip"
   port_id = module.control_node_port.id
@@ -75,4 +93,13 @@ module "http_secgroup" {
   direction = "ingress"
   port_min  = 80
   port_max  = 80
+}
+
+module "database_secgroup" {
+  source = "./modules/network/security_group"
+
+  name      = "http"
+  direction = "ingress"
+  port_min  = 3306
+  port_max  = 3307
 }
