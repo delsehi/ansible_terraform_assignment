@@ -17,3 +17,4 @@ Run "source ./openrc.sh" and type in the password to your CsCloud account to add
 
 Create a file terraform.tfvars and add the neccessary information. Look at terraform.tfvars.sample for an example. 
 
+Add the backup files "acme_wordpress_files.tar.gz", "backup.sql" and "acme.wordpress.2018-10-09.xml" to the directory ansible/files. 

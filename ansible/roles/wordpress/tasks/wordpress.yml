@@ -1,27 +1,83 @@
+- name: Transfer xml import file
+  ansible.builtin.copy:
+    src: /home/ubuntu/acme.wordpress.2018-10-09.xml
+    dest: /home/ubuntu/import.xml
+    owner: root
+    group: root
+    mode: 0777
+
 - name: Download wordpress
   register: zip_file
   get_url:
-    url: "http://wordpress.org/wordpress-{{ wp_version }}.tar.gz"
-    dest: "{{ wp_download_dir }}/wordpress-{{ wp_version }}.tar.gz"
+    url: 'http://wordpress.org/wordpress-{{ wp_version }}.tar.gz'
+    dest: '{{ wp_download_dir }}/wordpress-{{ wp_version }}.tar.gz'
+
+- name: Unmount nfs-server wp-content directory
+  become: yes
+  mount:
+    src: 'fs:/mnt/sharedfiles/wp-content'
+    path: /var/www/{{ domain_name }}/wordpress/wp-content/
+    state: absent
+    fstype: nfs
+
+- name: Delete wordpress if exists
+  file:
+    state: absent
+    path: /var/www/{{ domain_name }}/wordpress/
 
 - name: Unarchive
   ansible.builtin.unarchive:
-    src: "{{ zip_file.dest }}"
-    dest: "/var/www/{{ domain_name }}"
+    src: '{{ zip_file.dest }}'
+    dest: '/var/www/{{ domain_name }}'
     remote_src: yes
 
 - name: Set ownership
   file:
-    path: "/var/www/{{ domain_name }}"
+    path: '/var/www/{{ domain_name }}'
     state: directory
     recurse: yes
     owner: www-data
     group: www-data
 
+- name: Delete default wp-content
+  file:
+    state: absent
+    path: /var/www/{{ domain_name }}/wordpress/wp-content/
+
+- name: Create wp-content directory
+  file:
+    path: /var/www/{{ domain_name }}/wordpress/wp-content/
+    state: directory
+
+- name: Mount nfs-server wp-content directory
+  become: yes
+  mount:
+    src: 'fs:/mnt/sharedfiles/wp-content'
+    path: /var/www/{{ domain_name }}/wordpress/wp-content/
+    state: mounted
+    fstype: nfs
+
 - name: Setup wp-config
   template:
-    src: "files/wp-config.php.j2"
-    dest: "/var/www/{{ domain_name }}/wordpress/wp-config.php"
+    src: 'files/wp-config.php.j2'
+    dest: '/var/www/{{ domain_name }}/wordpress/wp-config.php'
     mode: '0640'
+    owner: www-data
+    group: www-data
+  notify: Reload Apache
 
+- name: Check if wp-cli exists
+  stat: path="/usr/local/bin/wp"
+  register: wpcli_exist
 
+- name: Updating wp-cli
+  shell: '/usr/local/bin/wp cli update --yes'
+  when: wpcli_exist.stat.exists
+
+- name: Download wp-cli
+  get_url:
+    url="https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar"
+    dest="/usr/local/bin/wp"
+    force_basic_auth=yes
+    mode=0755
+  when: not wpcli_exist.stat.exists

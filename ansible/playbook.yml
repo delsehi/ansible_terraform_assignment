@@ -5,6 +5,18 @@
   roles:
     - common
 
+- name: Manage wp files on control node
+  hosts: localhost
+  roles:
+    - controlnode
+
+- name: Install and set up nfs-server
+  hosts: fs
+  remote_user: ubuntu
+  become: yes
+  roles:
+    - fileserver
+
 - name: Install MariaDB
   hosts: dbmaster, dbslave
   remote_user: ubuntu
@@ -37,9 +49,9 @@
   roles:
     - wordpress
 
-- name: Install and set up nfs-server
-  hosts: fs
+- name: Configure and wordpress themes, plugins and permalinks
+  hosts: wp[0]
   remote_user: ubuntu
   become: yes
   roles:
-    - fileserver
+    - wpconfig

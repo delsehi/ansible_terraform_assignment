@@ -1,17 +1,11 @@
 ---
-# - name: Add repository for MariaDB
-#   template:
-#     src: mariadb.list.j2
-#     dest: /etc/apt/sources.list.d/mariadb.list
-#     owner: root
-#     group: root
-#     mode: 0644
-
-# - name: Add keys for repository
-#   apt_key:
-#     keyserver: hkp://keyserver.ubuntu.com:80
-#     id: '0xF1656F24C74CD1D8'
-#     state: present
+- name: Transfer backup sql file
+  ansible.builtin.copy:
+    src: /home/ubuntu/backup.sql
+    dest: /home/ubuntu/backup.sql
+    owner: root
+    group: root
+    mode: 0600
 
 - name: Install python module
   apt: name=python3-pymysql state=latest
@@ -23,11 +17,11 @@
       - mariadb-client
     state: present
     update_cache: yes
-    cache_valid_time: "{{ aptget_update_cache_valid_time }}"
+    cache_valid_time: '{{ aptget_update_cache_valid_time }}'
 
 - name: Start and enable MariaDB service
   service:
-    name: "{{ mariadb_service_name }}"
+    name: '{{ mariadb_service_name }}'
     state: started
     enabled: yes
 
@@ -39,7 +33,7 @@
     group: root
     mode: 0600
 
-- name: Install network configuration file 
+- name: Install network configuration file
   template:
     src: settings.cnf.j2
     dest: /etc/mysql/mariadb.conf.d/settings.cnf
@@ -51,8 +45,8 @@
 - name: Create root user with password
   mysql_user:
     name: root
-    host: "{{ item }}"
-    password: "{{ mariadb_root_password }}"
+    host: '{{ item }}'
+    password: '{{ mariadb_root_password }}'
     state: present
     login_unix_socket: /var/run/mysqld/mysqld.sock
   with_items:
@@ -87,7 +81,7 @@
 - name: Delete anonymous users
   mysql_user:
     name: ''
-    host: "{{ item }}"
+    host: '{{ item }}'
     state: absent
     login_unix_socket: /var/run/mysqld/mysqld.sock
   with_items:
@@ -95,20 +89,22 @@
 
 - name: Create databases
   mysql_db:
-    name: "{{ item }}"
-    state: present
-    # check_hostname: no
+    name: '{{ item }}'
+    state: import
+    target: /home/ubuntu/backup.sql
     login_unix_socket: /var/run/mysqld/mysqld.sock
   with_items:
-    - "{{ mariadb_databases }}"
-
+    - '{{ mariadb_databases }}'
 
 - name: Grant access for all wordpress hosts
   mysql_user:
-    name: "client"
-    password: "changeme"
-    host: "%"
-    priv: "*.*:ALL"
+    name: 'client'
+    password: 'changeme'
+    host: '%'
+    priv: '*.*:ALL'
     state: present
     login_unix_socket: /var/run/mysqld/mysqld.sock
-
+# - name: Update wp hostname to loadbalancer floating ip
+#   community.mysql.mysql_query:
+#     login_db: wordpress
+#     query: UPDATE wp_options SET autoload='no' WHERE option_id<3

@@ -1,0 +1,10 @@
+---
+- name: Create directory for unarchiving wordpress files
+  file:
+    state: directory
+    path: /home/ubuntu/acme_wordpress_files
+
+- name: Unarchive wordpress files
+  ansible.builtin.unarchive:
+    src: /home/ubuntu/acme_wordpress_files.tar.gz
+    dest: /home/ubuntu/acme_wordpress_files

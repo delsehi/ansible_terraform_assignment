@@ -1,8 +1,8 @@
 ---
 - name: Set up Apache VirtualHost
   template:
-    src: "files/{{ apache_config }}"
-    dest: "/etc/apache2/sites-available/{{ apache_config }}"
+    src: 'files/acme.conf'
+    dest: '/etc/apache2/sites-available/{{ apache_config }}'
   notify: Reload Apache
 
 # - name: Enable rewrite module
