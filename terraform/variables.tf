@@ -20,6 +20,9 @@ variable "cidr" {
 variable "private_key" {
   type = string # Path to your private ssh key for cscloud, this will be added to the control_node
 }
+variable "private_key_formatted" {
+  type = string
+}
 variable "public_key" {
   type = string # Path to your public ssh key for cscloud, this will be added to the control_node
 }
@@ -32,7 +35,7 @@ variable "git_api_url" {
 
 locals {
   install_ansible = {
-    private_key    = file(var.private_key),
+    private_key    = file(var.private_key_formatted),
     public_key     = file(var.public_key),
     master_db_ip   = module.database[0].internal_ip,
     slave_db_ip    = module.database[1].internal_ip,
