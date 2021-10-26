@@ -113,3 +113,7 @@ $RECYCLE.BIN/
 secrets
 secrets/*
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,terraform,ansible,git
+
+terraform/files/acme_wordpress_files.tar.gz
+terraform/files/acme.wordpress.2018-10-09.xml
+terraform/files/backup.sql

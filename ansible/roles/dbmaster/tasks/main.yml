@@ -2,12 +2,20 @@
 - name: Restart mysql service
   service: name=mysql state=restarted
 
+- name: Copy 50-server.cnf 
+  template:
+    src: 50-server.cnf.j2
+    dest: /etc/mysql/mariadb.conf.d/50-server.cnf
+    owner: root
+    group: root
+    mode: 0600
+
 - name: Run RESET MASTER command which will delete all existing binary log files
   community.mysql.mysql_replication:
     login_unix_socket: /var/run/mysqld/mysqld.sock
     mode: resetprimary
 
-- name: Get primary binlog file name and binlog position
-  community.mysql.mysql_replication:
-    login_unix_socket: /var/run/mysqld/mysqld.sock
-    mode: getprimary
+# - name: Get primary binlog file name and binlog position
+#   community.mysql.mysql_replication:
+#     login_unix_socket: /var/run/mysqld/mysqld.sock
+#     mode: getprimary
