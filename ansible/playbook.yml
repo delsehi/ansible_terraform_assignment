@@ -18,11 +18,27 @@
     - fileserver
 
 - name: Install MariaDB
-  hosts: dbmaster
+  hosts: dbmaster, dbslave
   remote_user: ubuntu
   become: yes
   roles:
     - mariadb
+
+- name: configure master server
+  hosts: dbmaster
+  remote_user: ubuntu
+  become: yes
+  roles:
+   - dbmaster
+
+- name: configure slave server
+  hosts: dbslave
+  remote_user: ubuntu
+  become: yes
+  vars_files:
+    - ./roles/mariadb/defaults/main.yml
+  roles:
+   - dbslave
 
 - name: Install Wordpress and dependencies
   hosts: wp
