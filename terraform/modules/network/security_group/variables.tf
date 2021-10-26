@@ -1,9 +1,9 @@
 variable "name" {
-
+  type = string
 }
 
 variable "direction" {
-
+  type = string
 }
 
 variable "protocol" {
@@ -12,11 +12,11 @@ variable "protocol" {
 }
 
 variable "port_min" {
-
+  type = number
 }
 
 variable "port_max" {
-
+  type = number
 }
 
 variable "remote_ip_prefix" {
