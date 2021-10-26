@@ -6,6 +6,7 @@ module "network" {
   cidr = var.cidr
 }
 
+# Create control node port
 module "control_node_port" {
   source = "./modules/network/port"
 
@@ -33,6 +34,7 @@ module "wordpress_port" {
   ]
 }
 
+# Create database ports
 module "database_port" {
   source = "./modules/network/port"
 
@@ -47,6 +49,7 @@ module "database_port" {
   ]
 }
 
+# Create fileserver port
 module "fileserver_port" {
   source = "./modules/network/port"
 
@@ -95,6 +98,7 @@ module "http_secgroup" {
   port_max  = 80
 }
 
+# Create database security group
 module "database_secgroup" {
   source = "./modules/network/security_group"
 

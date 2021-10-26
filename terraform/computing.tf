@@ -1,4 +1,4 @@
-# Create control node instance
+# Create openstack loadbalancer
 module "loadbalancer" {
   source = "./modules/loadbalancer"
 
@@ -8,6 +8,7 @@ module "loadbalancer" {
   members      = module.wordpress[*].internal_ip
 }
 
+# Create control node instance
 module "control_node" {
   source = "./modules/compute"
 
@@ -37,6 +38,7 @@ module "wordpress" {
   ]
 }
 
+# Create database instances
 module "database" {
   source = "./modules/compute"
 
@@ -50,6 +52,7 @@ module "database" {
   ]
 }
 
+# Create fileserver instance
 module "fileserver" {
   source = "./modules/compute"
 
