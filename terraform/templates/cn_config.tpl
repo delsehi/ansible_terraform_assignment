@@ -19,7 +19,7 @@ write_files:
 
       [wp]
 %{ for node in wp_nodes ~}
-      ${node.name} ansible_ssh_host=${node.network[0].fixed_ip_v4} 
+      ${node.name} ansible_ssh_host=${node.internal_ip} 
 %{ endfor ~}
     path: /etc/ansible/hosts
     append: true
