@@ -7,6 +7,10 @@ terraform {
   }
 }
 
+data "openstack_networking_secgroup_v2" "default_secgroup" {
+  name = "default"
+}
+
 resource "openstack_networking_port_v2" "port" {
   name       = var.name
   network_id = var.network_id
@@ -15,5 +19,8 @@ resource "openstack_networking_port_v2" "port" {
     subnet_id = var.subnet_id
   }
 
-  security_group_ids = var.secgroup_ids
+  security_group_ids = concat(
+    [data.openstack_networking_secgroup_v2.default_secgroup.id],
+    var.secgroup_ids
+  )
 }
