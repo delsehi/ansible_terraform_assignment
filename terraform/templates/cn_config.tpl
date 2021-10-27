@@ -30,23 +30,15 @@ write_files:
       private_key_file = ~/.ssh/key
       host_key_checking = False
     path: /etc/ansible/ansible.cfg
-  # Ansible roles needed to be installed
-  - content: |
-      - src: cloudalchemy.prometheus
-      - src: community.mysql
-      - src: cloudalchemy.alertmanager
-    path: /home/ubuntu/requirements.yml
 ssh_keys:
   rsa_private: |
     ${private_key}
   rsa_public: ${public_key}
 runcmd:
-  # Download repo with ansible playbooks
-  # - 'curl --header "Private-Token: ${access_token}" "${api_url}" --output /home/ubuntu/repo'
-  # - 'unzip /home/ubuntu/repo -d /home/ubuntu'
-  # - 'rm -r /home/ubuntu/repo'
   # Set up ssh key for ansible
   - 'cp /etc/ssh/ssh_host_rsa_key home/ubuntu/.ssh/key'
   - 'chmod 444 home/ubuntu/.ssh/key'
   # Install community plugin for mysql in ansible-galaxy
   - 'runuser -l ubuntu -c "ansible-galaxy collection install community.mysql"'
+  - 'runuser -l ubuntu -c "ansible-galaxy install cloudalchemy.alertmanager"'
+  - 'runuser -l ubuntu -c "ansible-galaxy install cloudalchemy.prometheus"'
