@@ -47,3 +47,24 @@
     - cloudalchemy.prometheus
   vars:
     prometheus_config_file: 'templates/prometheus_cfg.yml.j2'
+    prometheus_alertmanager_config:
+      - static_configs:
+          - targets:
+              - localhost:9093
+    prometheus_alert_rules:
+      - alert: InstanceDown
+        expr: 'up == 0'
+        for: 1m
+        labels:
+          severity: 'critical'
+        annotations:
+          title: '{% raw %}Instance {{ $labels.instance }} down{% endraw %}'
+          description: '{% raw %}{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute.{% endraw %}'
+
+- name: Install alertmanager
+  hosts: localhost
+  connection: local
+  roles:
+    - cloudalchemy.alertmanager
+  vars:
+    alertmanager_config_file: 'templates/alertmanager_cfg.yml.j2'
