@@ -1,16 +1,29 @@
 # Run ansible playbook on control node
 module "run_ansible" {
   source = "./modules/command/remote_exec"
-
-  command     = "ansible-playbook 2dv*/ansible/playbook.yml"
+  # Run cloud-init status to wait until it is done before running the playbook
+  command     = "cloud-init status --wait && ansible-playbook ansible/playbook.yml"
   remote_host = module.control_node_floating_ip.address
   private_key = file(var.private_key)
 
   depends_on = [
+    module.control_node,
     module.transfer_backupsql,
+    module.transfer_ansible,
     module.transfer_wordpress_files,
     module.transfer_xmlimport,
     module.create_loadbalancer_ip_file
+  ]
+}
+# Transfer the Ansible Playbook to the control node
+module "transfer_ansible" {
+  source           = "./modules/command/transfer_file"
+  source_file      = "../ansible"
+  destination_file = "/home/ubuntu/ansible"
+  remote_host      = module.control_node_floating_ip.address
+  private_key      = file(var.private_key)
+  depends_on = [
+    module.control_node
   ]
 }
 
