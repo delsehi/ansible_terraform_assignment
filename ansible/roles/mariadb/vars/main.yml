@@ -1,4 +1,4 @@
-mariadb_version: 10.1.22
+mariadb_version: 10.3.31
 
 mariadb_service_name: mysql
 mariadb_secure_installation: True

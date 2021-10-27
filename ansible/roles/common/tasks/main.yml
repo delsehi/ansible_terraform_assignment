@@ -5,7 +5,7 @@
   become: true
   become_method: sudo
   apt: 
-    # upgrade: full
+    upgrade: full
     update_cache: true
 
 - name: Edit hosts file
