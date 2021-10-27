@@ -1,0 +1,58 @@
+---
+- name: Create user for prometheus exporter
+  community.mysql.mysql_query:
+    query:
+      - DROP USER 'exporter'@'127.0.0.1'
+      - CREATE USER 'exporter'@'127.0.0.1' IDENTIFIED BY 'dev' WITH MAX_USER_CONNECTIONS 3
+      - GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO 'exporter'@'127.0.0.1'
+    login_user: root
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Ensure group mysql_exporter exists
+  ansible.builtin.group:
+    name: mysql_exporter
+    state: present
+
+- name: Create user to run exporter
+  user:
+    name: mysql_exporter
+    group: mysql_exporter
+
+- name: Download prometheus mysql exporter
+  get_url:
+    url: '{{ mysql_exporter_url }}'
+    dest: /home/ubuntu
+
+- name: Unarchive and move exporter
+  ansible.builtin.unarchive:
+    src: '/home/ubuntu/{{ mysql_exporter_filename }}'
+    dest: '/home/ubuntu/'
+    remote_src: yes
+
+- name: Move binary
+  shell: 'mv /home/ubuntu/mysqld_exporter-*/mysqld_exporter /usr/local/bin/'
+
+- name: Create a mysql_exporter service file under systemd
+  template:
+    src: 'mysql_exporter.service.j2'
+    dest: '/etc/systemd/system/mysql_exporter.service'
+    mode: 0770
+    owner: mysql_exporter
+    group: mysql_exporter
+
+- name: Create config file for exporter
+  template:
+    src: '.my.cnf.j2'
+    dest: '/home/mysql_exporter/.my.cnf'
+    mode: 0770
+    owner: mysql_exporter
+    group: mysql_exporter
+
+- name: Reload system daemon
+  shell: 'systemctl daemon-reload'
+
+- name: Start exporter
+  shell: 'systemctl start mysql_exporter'
+
+- name: Enable exporter
+  shell: 'systemctl enable mysql_exporter'

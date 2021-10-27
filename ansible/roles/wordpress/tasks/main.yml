@@ -19,3 +19,6 @@
 
 - name: Include wordpress.yml
   include_tasks: wordpress.yml
+
+- name: Include prometheus.yml
+  include_tasks: prometheus.yml

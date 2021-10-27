@@ -6,6 +6,7 @@ packages:
   - python
   - unzip
 write_files:
+  # Ansible inventory
   - content: |
       [local]
       localhost ansible_ssh_host=localhost
@@ -23,11 +24,18 @@ write_files:
 %{ endfor ~}
     path: /etc/ansible/hosts
     append: true
+  # Config ansible to use ssh key and not check host
   - content: |
       [defaults]
       private_key_file = ~/.ssh/key
       host_key_checking = False
     path: /etc/ansible/ansible.cfg
+  # Ansible roles needed to be installed
+  - content: |
+      - src: cloudalchemy.prometheus
+      - src: community.mysql
+      - src: cloudalchemy.alertmanager
+    path: /home/ubuntu/requirements.yml
 ssh_keys:
   rsa_private: |
     ${private_key}
