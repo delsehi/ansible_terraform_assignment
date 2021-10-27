@@ -1,0 +1,41 @@
+---
+- name: Ensure group apache_exporter exists
+  ansible.builtin.group:
+    name: apache_exporter
+    state: present
+
+- name: Create user to run exporter
+  user:
+    name: apache_exporter
+    group: apache_exporter
+
+- name: Download apache exporter
+  get_url:
+    url: '{{ apache_exporter_url }}'
+    dest: /home/ubuntu
+
+- name: Unarchive and move exporter
+  ansible.builtin.unarchive:
+    src: '/home/ubuntu/{{ apache_exporter_filename }}'
+    dest: '/home/ubuntu/'
+    remote_src: yes
+
+- name: Move binary
+  shell: 'mv /home/ubuntu/apache_exporter-*/apache_exporter /usr/local/bin/'
+
+- name: Create a apache_exporter service file under systemd
+  template:
+    src: 'files/apache_exporter.service.j2'
+    dest: '/etc/systemd/system/apache_exporter.service'
+    mode: 0770
+    owner: apache_exporter
+    group: apache_exporter
+
+- name: Reload system daemon
+  shell: 'systemctl daemon-reload'
+
+- name: Start exporter
+  shell: 'systemctl start apache_exporter'
+
+- name: Enable exporter
+  shell: 'systemctl enable apache_exporter'

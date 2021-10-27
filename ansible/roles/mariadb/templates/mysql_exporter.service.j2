@@ -1,0 +1,12 @@
+[Unit]
+Description=MySQL Exporter
+After=network.target
+ 
+[Service]
+User=mysql_exporter
+Group=mysql_exporter
+Type=simple
+ExecStart=/usr/local/bin/mysqld_exporter
+ 
+[Install]
+WantedBy=multi-user.target

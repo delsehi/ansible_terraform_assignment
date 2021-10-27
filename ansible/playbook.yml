@@ -1,41 +1,49 @@
 ---
-- name: Upgrade and update packages and set host file
-  hosts: all
-  remote_user: ubuntu
-  roles:
-    - common
+# - name: Upgrade and update packages and set host file
+#   hosts: all
+#   remote_user: ubuntu
+#   roles:
+#     - common
 
-- name: Manage wp files on control node
+# - name: Manage wp files on control node
+#   hosts: localhost
+#   roles:
+#     - controlnode
+
+# - name: Install and set up nfs-server
+#   hosts: fs
+#   remote_user: ubuntu
+#   become: yes
+#   roles:
+#     - fileserver
+
+# - name: Install MariaDB
+#   hosts: dbmaster
+#   remote_user: ubuntu
+#   become: yes
+#   roles:
+#     - mariadb
+
+# - name: Install Wordpress and dependencies
+#   hosts: wp
+#   remote_user: ubuntu
+#   become: yes
+#   vars_files:
+#     - ./vars/wordpress.yml
+#   roles:
+#     - wordpress
+
+# - name: Configure and wordpress themes, plugins and permalinks
+#   hosts: wp[0]
+#   remote_user: ubuntu
+#   become: yes
+#   roles:
+#     - wpconfig
+
+- name: Install prometheus
   hosts: localhost
+  connection: local
   roles:
-    - controlnode
-
-- name: Install and set up nfs-server
-  hosts: fs
-  remote_user: ubuntu
-  become: yes
-  roles:
-    - fileserver
-
-- name: Install MariaDB
-  hosts: dbmaster
-  remote_user: ubuntu
-  become: yes
-  roles:
-    - mariadb
-
-- name: Install Wordpress and dependencies
-  hosts: wp
-  remote_user: ubuntu
-  become: yes
-  vars_files:
-    - ./vars/wordpress.yml
-  roles:
-    - wordpress
-
-- name: Configure and wordpress themes, plugins and permalinks
-  hosts: wp[0]
-  remote_user: ubuntu
-  become: yes
-  roles:
-    - wpconfig
+    - cloudalchemy.prometheus
+  vars:
+    prometheus_config_file: 'templates/prometheus_cfg.yml.j2'

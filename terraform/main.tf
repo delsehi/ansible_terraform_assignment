@@ -20,6 +20,7 @@ resource "null_resource" "start_ansible" {
     }
 
     inline = [
+      "ansible-galaxy install -r /home/ubuntu/requirements.yml",
       "ansible-playbook 2dv*/ansible/playbook.yml"
     ]
   }

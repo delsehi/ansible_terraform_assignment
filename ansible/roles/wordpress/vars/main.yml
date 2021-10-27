@@ -3,3 +3,6 @@ db_user: client
 # TODO: Change dynamically
 mariadb_root_password: changeme
 db_host: 'dbmaster'
+
+apache_exporter_url: https://github.com/Lusitaniae/apache_exporter/releases/download/v0.10.1/apache_exporter-0.10.1.linux-amd64.tar.gz
+apache_exporter_filename: apache_exporter-0.10.1.linux-amd64.tar.gz
