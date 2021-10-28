@@ -3,8 +3,6 @@ package_update: true
 # package_upgrade: true
 packages:
   - ansible
-  - python
-  - unzip
 write_files:
   # Ansible inventory
   - content: |
