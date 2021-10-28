@@ -29,7 +29,7 @@
   remote_user: ubuntu
   become: yes
   roles:
-   - dbmaster
+    - dbmaster
 
 - name: configure slave server
   hosts: dbslave
@@ -38,7 +38,7 @@
   vars_files:
     - ./roles/mariadb/defaults/main.yml
   roles:
-   - dbslave
+    - dbslave
 
 - name: Install Wordpress and dependencies
   hosts: wp
