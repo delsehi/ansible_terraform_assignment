@@ -1,0 +1,41 @@
+---
+- name: Ensure group node_exporter exists
+  ansible.builtin.group:
+    name: node_exporter
+    state: present
+
+- name: Create user to run exporter
+  user:
+    name: node_exporter
+    group: node_exporter
+
+- name: Download node exporter
+  get_url:
+    url: '{{ node_exporter_url }}'
+    dest: /home/ubuntu
+
+- name: Unarchive and move exporter
+  ansible.builtin.unarchive:
+    src: '/home/ubuntu/{{ node_exporter_filename }}'
+    dest: '/home/ubuntu/'
+    remote_src: yes
+
+- name: Move binary
+  shell: 'mv /home/ubuntu/node_exporter-*/node_exporter /usr/local/bin/'
+
+- name: Create a node_exporter service file under systemd
+  template:
+    src: 'node_exporter.service.j2'
+    dest: '/etc/systemd/system/node_exporter.service'
+    mode: 0770
+    owner: node_exporter
+    group: node_exporter
+
+- name: Reload system daemon
+  shell: 'systemctl daemon-reload'
+
+- name: Start exporter
+  shell: 'systemctl start node_exporter'
+
+- name: Enable exporter
+  shell: 'systemctl enable node_exporter'
