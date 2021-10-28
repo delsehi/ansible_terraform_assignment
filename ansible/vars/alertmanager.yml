@@ -1,0 +1,2 @@
+alertmanager_config_file: 'templates/alertmanager_cfg.yml.j2'
+alertmanager_slack_api_url: 'https://hooks.slack.com/services/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'

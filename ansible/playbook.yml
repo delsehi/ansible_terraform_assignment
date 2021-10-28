@@ -1,86 +1,73 @@
 ---
-- name: Upgrade and update packages and set host file
-  hosts: all
-  remote_user: ubuntu
-  roles:
-    - common
+# - name: Upgrade and update packages and set host file
+#   hosts: all
+#   remote_user: ubuntu
+#   roles:
+#     - common
 
-- name: Manage wp files on control node
-  hosts: localhost
-  roles:
-    - controlnode
+# - name: Manage wp files on control node
+#   hosts: localhost
+#   roles:
+#     - controlnode
 
-- name: Install and set up nfs-server
-  hosts: fs
-  remote_user: ubuntu
-  become: yes
-  roles:
-    - fileserver
+# - name: Install and set up nfs-server
+#   hosts: fs
+#   remote_user: ubuntu
+#   become: yes
+#   roles:
+#     - fileserver
 
-- name: Install MariaDB
-  hosts: dbmaster, dbslave
-  remote_user: ubuntu
-  become: yes
-  roles:
-    - mariadb
+# - name: Install MariaDB
+#   hosts: dbmaster, dbslave
+#   remote_user: ubuntu
+#   become: yes
+#   roles:
+#     - mariadb
 
-- name: configure master server
-  hosts: dbmaster
-  remote_user: ubuntu
-  become: yes
-  roles:
-    - dbmaster
+# - name: configure master server
+#   hosts: dbmaster
+#   remote_user: ubuntu
+#   become: yes
+#   roles:
+#     - dbmaster
 
-- name: configure slave server
-  hosts: dbslave
-  remote_user: ubuntu
-  become: yes
-  vars_files:
-    - ./roles/mariadb/defaults/main.yml
-  roles:
-    - dbslave
+# - name: configure slave server
+#   hosts: dbslave
+#   remote_user: ubuntu
+#   become: yes
+#   vars_files:
+#     - ./roles/mariadb/defaults/main.yml
+#   roles:
+#     - dbslave
 
-- name: Install Wordpress and dependencies
-  hosts: wp
-  remote_user: ubuntu
-  become: yes
-  vars_files:
-    - ./vars/wordpress.yml
-  roles:
-    - wordpress
+# - name: Install Wordpress and dependencies
+#   hosts: wp
+#   remote_user: ubuntu
+#   become: yes
+#   vars_files:
+#     - ./vars/wordpress.yml
+#   roles:
+#     - wordpress
 
-- name: Configure and wordpress themes, plugins and permalinks
-  hosts: wp[0]
-  remote_user: ubuntu
-  become: yes
-  roles:
-    - wpconfig
+# - name: Configure and wordpress themes, plugins and permalinks
+#   hosts: wp[0]
+#   remote_user: ubuntu
+#   become: yes
+#   roles:
+#     - wpconfig
 
 - name: Install prometheus
   hosts: localhost
   connection: local
   roles:
     - cloudalchemy.prometheus
-  vars:
-    prometheus_config_file: 'templates/prometheus_cfg.yml.j2'
-    prometheus_alertmanager_config:
-      - static_configs:
-          - targets:
-              - localhost:9093
-    prometheus_alert_rules:
-      - alert: InstanceDown
-        expr: 'up == 0'
-        for: 1m
-        labels:
-          severity: 'critical'
-        annotations:
-          title: '{% raw %}Instance {{ $labels.instance }} down{% endraw %}'
-          description: '{% raw %}{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute.{% endraw %}'
+  vars_files:
+    - ./vars/prometheus.yml
 
 - name: Install alertmanager
   hosts: localhost
   connection: local
   roles:
     - cloudalchemy.alertmanager
-  vars:
-    alertmanager_config_file: 'templates/alertmanager_cfg.yml.j2'
+  vars_files:
+    - ./vars/alertmanager.yml
