@@ -1,3 +1,6 @@
 ---
 - name: Set up nfs-server
   include_tasks: nfsserver.yml
+
+- name: Set up node exporter
+  include_tasks: prometheus.yml
