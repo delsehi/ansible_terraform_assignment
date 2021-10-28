@@ -1,19 +1,11 @@
 
 - name: Modify configuration file to setup server ID
-  lineinfile: dest=/etc/mysql/my.cnf regexp="^#server-id" line="server_id=2"
+  lineinfile: dest=/etc/mysql/mariadb.conf.d/50-server.cnf regexp="^#server-id" line="server-id=2"
 
-# - name: Stop slave first
-#   become: yes
-#   command: /usr/bin/mysql -uroot -e "STOP SLAVE"
-
-# - name: Setup replication
-#   become: yes
-#   command: /usr/bin/mysql -uroot -e "CHANGE MASTER TO master_host='dbmaster', master_user='repl', master_password='{{ mariadb_repl_password }}', master_use_gtid=current_pos"
 - name: Stop mysql replica thread
   community.mysql.mysql_replication:
     login_unix_socket: /var/run/mysqld/mysqld.sock
     mode: stopreplica
-
 
 - name: Setup replication
   become: yes
