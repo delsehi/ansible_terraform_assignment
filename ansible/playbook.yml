@@ -59,4 +59,19 @@
   become: yes
   roles:
     - wpconfig
-  tags: wp
+
+- name: Install prometheus
+  hosts: localhost
+  connection: local
+  roles:
+    - cloudalchemy.prometheus
+  vars_files:
+    - ./vars/prometheus.yml
+
+- name: Install alertmanager
+  hosts: localhost
+  connection: local
+  roles:
+    - cloudalchemy.alertmanager
+  vars_files:
+    - ./vars/alertmanager.yml

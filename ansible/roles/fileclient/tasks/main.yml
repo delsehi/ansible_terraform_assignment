@@ -1,3 +1,0 @@
----
-- name: Set up nfs-client
-  include_tasks: nfsclient.yml
