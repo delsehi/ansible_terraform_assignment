@@ -1,6 +1,3 @@
-- name: Restart mysql service
-  service: name=mysql state=restarted
-
 - name: Copy 50-server.cnf
   template:
     src: 50-server.cnf.j2
@@ -8,6 +5,9 @@
     owner: root
     group: root
     mode: 0644
+
+- name: Restart mysql service
+  service: name=mysql state=restarted
 
 - name: Run RESET MASTER command which will delete all existing binary log files
   community.mysql.mysql_replication:
