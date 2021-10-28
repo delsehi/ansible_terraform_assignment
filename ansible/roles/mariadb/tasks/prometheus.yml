@@ -2,7 +2,7 @@
 - name: Create user for prometheus exporter
   community.mysql.mysql_query:
     query:
-      - DROP USER 'exporter'@'127.0.0.1'
+      - DROP USER IF EXISTS 'exporter'@'127.0.0.1'
       - CREATE USER 'exporter'@'127.0.0.1' IDENTIFIED BY 'dev' WITH MAX_USER_CONNECTIONS 3
       - GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO 'exporter'@'127.0.0.1'
     login_user: root
