@@ -2,7 +2,9 @@
 
 ## Introduction
 This is for an assignment in the course 2DV517 at Linnaeus University 2021. 
-We are Elias, Emil, Lucas and Delfi. 
+We are Elias, Emil and Delfi. 
+
+The purpose was to deploy an existing Wordpress application to Openstack using infrastructure as code tools with database replication and better scalability. 
 
 ## Set up 
 Clone this repo. 
